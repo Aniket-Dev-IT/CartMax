@@ -67,56 +67,56 @@ Mobile-first approach ensuring perfect display on all devices. Touch-friendly in
 ### 🏠 **Homepage**
 The welcome screen features a stunning hero section with featured categories, a carousel of promotions, and a showcase of popular products. The intuitive navigation bar makes browsing effortless, while the search bar provides quick access to find exactly what you're looking for.
 
-![Home page](static/snap/Home%20page.png)
+![Home page](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Home%20page.png)
 
 ---
 
 ### 👤 **User Profile Management**
 A comprehensive profile page where users can manage their account details, shipping addresses, payment methods, and view their complete order history. Users can easily update their preferred currency, personal information, and contact details all in one secure location.
 
-![User Profile](static/snap/User%20Profile.png)
+![User Profile](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/User%20Profile.png)
 
 ---
 
 ### 📋 **Order History & Management**
 Track all your orders from one convenient location. View order status (pending, processing, shipped, delivered), order dates, totals, and quick access to order details. The order history supports filtering and sorting for easy navigation through multiple purchases.
 
-![Orders](static/snap/Orders.png)
+![Orders](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Orders.png)
 
 ---
 
 ### 📦 **Order Details Page**
 Detailed order information includes itemized product list with quantities and prices, shipping address, payment method, applied discounts, tax calculations, and order total. Track order status and view estimated delivery dates. Easy access to customer service contact for any order inquiries.
 
-![Order Info](static/snap/Order%20Info.png)
+![Order Info](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Order%20Info.png)
 
 ---
 
 ### ✅ **Order Success Confirmation**
 After successful checkout, customers receive a beautiful confirmation page showing their unique order ID, order summary with all items, total amount paid, and estimated delivery information. A printable version is available for records.
 
-![Order Success](static/snap/Order%20Success.png)
+![Order Success](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Order%20Success.png)
 
 ---
 
 ### 📊 **Admin Dashboard**
 The administration interface provides a complete overview of your e-commerce operations at a glance. Dashboard displays key metrics including total sales, number of orders, active users, and popular products. Quick action buttons provide rapid access to common admin tasks.
 
-![Admin Dashboard](static/snap/Admin%20Dashboard.png)
+![Admin Dashboard](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Admin%20Dashboard.png)
 
 ---
 
 ### 🛠️ **Admin Product Management**
 Full product management interface allowing administrators to add, edit, and delete products. Bulk operations for managing multiple products simultaneously. Features include product details (name, description, prices in both currencies), inventory levels, images, categories, and search keywords. Comprehensive filter and search options for finding specific products quickly.
 
-![Admin Products Management](static/snap/Admin%20Products%20Management.png)
+![Admin Products Management](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Admin%20Products%20Management.png)
 
 ---
 
 ### 💰 **Dual-Currency Pricing Dashboard**
 Experience the flexibility of CartMax's dual-currency system. Prices are automatically displayed in your preferred currency (INR or USD) with real-time conversions. The pricing dashboard shows product costs, discounts, and totals in both currencies side-by-side for complete transparency.
 
-![Pricing Dashboard INR & USD](static/snap/Pricing%20Dashboard%20INR%20%26%20USD.png)
+![Pricing Dashboard INR & USD](https://raw.githubusercontent.com/Aniket-Dev-IT/CartMax/main/static/snap/Pricing%20Dashboard%20INR%20%26%20USD.png)
 
 ---
 
