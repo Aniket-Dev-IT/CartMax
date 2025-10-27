@@ -1,0 +1,94 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tags text-primary me-2"></i>
+                    Category Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_name" class="form-label fw-bold">Category Name *</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_slug" class="form-label fw-bold">Slug</label>
+                            {{ form.slug }}
+                            <small class="form-text text-muted">Auto-generated from name if left empty</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label fw-bold">Description</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_image" class="form-label fw-bold">Category Image</label>
+                            {{ form.image }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                {{ form.is_active }}
+                                <label for="id_is_active" class="form-check-label fw-bold">
+                                    Active Category
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-professional">
+                                <i class="fas fa-save me-2"></i>{{ submit_text }}
+                            </button>
+                            <a href="{% url 'admin_dashboard:category_list' %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Help
+                </h3>
+            </div>
+            <div class="card-body">
+                <h6>Category Guidelines</h6>
+                <ul class="mb-3">
+                    <li>Use clear, descriptive category names</li>
+                    <li>Slugs are used in URLs (auto-generated if empty)</li>
+                    <li>Add a brief description to help customers</li>
+                    <li>Upload a representative image (optional)</li>
+                </ul>
+                
+                <h6>SEO Tips</h6>
+                <ul>
+                    <li>Keep category names under 60 characters</li>
+                    <li>Use keywords customers would search for</li>
+                    <li>Descriptions help with search rankings</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

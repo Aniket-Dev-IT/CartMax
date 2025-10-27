@@ -1,0 +1,340 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Admin Control Dashboard{% endblock %}
+
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
+                <div class="flex-grow-1 mb-3 mb-md-0">
+                    <h3 class="text-primary mb-2 fw-bold">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Admin Control Panel
+                    </h3>
+                    <p class="text-muted mb-0 small">Manage your CartMax e-commerce platform with professional tools and real-time insights.</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success px-3 py-2" style="font-size: 12px;">
+                        <i class="fas fa-check-circle me-1"></i>
+                        System Online
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-value">{{ total_products|default:"0" }}</div>
+            <div class="stat-label">Products</div>
+            <div class="mt-2">
+                <a href="{% url 'admin_dashboard:product_list' %}" class="btn-professional btn-sm">
+                    <i class="fas fa-eye me-1"></i> Manage
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="stat-value">{{ total_orders|default:"0" }}</div>
+            <div class="stat-label">Orders</div>
+            <div class="mt-2">
+                <a href="{% url 'admin_dashboard:order_list' %}" class="btn-professional btn-sm">
+                    <i class="fas fa-eye me-1"></i> Manage
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stat-value">{{ total_categories|default:"0" }}</div>
+            <div class="stat-label">Categories</div>
+            <div class="mt-2">
+                <a href="{% url 'admin_dashboard:category_list' %}" class="btn-professional btn-sm">
+                    <i class="fas fa-eye me-1"></i> Manage
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-danger-gradient">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_users|default:"0" }}</div>
+            <div class="stat-label">Users</div>
+            <div class="mt-2">
+                <a href="{% url 'admin_dashboard:user_list' %}" class="btn-professional btn-sm">
+                    <i class="fas fa-eye me-1"></i> Manage
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-info-gradient">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div class="stat-value">{{ total_coupons|default:"0" }}</div>
+            <div class="stat-label">Discount Coupons</div>
+            <div class="mt-2">
+                <a href="{% url 'admin_dashboard:coupon_list' %}" class="btn-professional btn-sm">
+                    <i class="fas fa-eye me-1"></i> Manage
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revenue Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-line text-success me-2"></i>
+                    Revenue Summary
+                </h3>
+                <small class="text-muted">Last 30 days performance</small>
+            </div>
+            <div class="text-center" style="padding: 20px;">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-value text-success" style="font-size: 22px;">₹{{ total_revenue|floatformat:"0" }}</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-value text-primary" style="font-size: 22px;">{{ total_orders }}</div>
+                        <div class="stat-label">Orders Completed</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="stat-value text-info" style="font-size: 22px;">₹{{ avg_order_value|floatformat:"0" }}</div>
+                        <div class="stat-label">Avg Order Value</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Dashboards -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    Pricing Analytics
+                </h3>
+            </div>
+            <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
+                <p class="text-muted mb-3 small">Smart pricing optimization with dual currency support and AI-powered recommendations.</p>
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Price Optimization</span>
+                        <span class="badge bg-success small">Active</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Dual Currency</span>
+                        <span class="badge bg-info small">INR & USD</span>
+                    </div>
+                </div>
+                <div class="mt-auto">
+                    <a href="{% url 'admin_dashboard:pricing_dashboard' %}" class="btn-professional">
+                        <i class="fas fa-chart-line me-1"></i> View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-3">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-trophy text-success me-2"></i>
+                    Performance Tracking
+                </h3>
+            </div>
+            <div style="padding: 20px; flex: 1; display: flex; flex-direction: column;">
+                <p class="text-muted mb-3 small">Monitor sales performance, track inventory, and analyze customer satisfaction metrics.</p>
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Sales Analytics</span>
+                        <span class="badge bg-success small">Real-time</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted small">Stock Monitoring</span>
+                        <span class="badge bg-warning small">Active</span>
+                    </div>
+                </div>
+                <div class="mt-auto">
+                    <a href="{% url 'admin_dashboard:product_performance_dashboard' %}" class="btn-professional">
+                        <i class="fas fa-trophy me-1"></i> View Performance
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Management Tools -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-tools text-warning me-2"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div style="padding: 20px;">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center p-3 border rounded h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <i class="fas fa-plus-circle fa-lg text-primary"></i>
+                            </div>
+                            <h6 class="mb-2">Add Product</h6>
+                            <div class="mt-auto">
+                                <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-plus me-1"></i> Create
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center p-3 border rounded h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <i class="fas fa-edit fa-lg text-success"></i>
+                            </div>
+                            <h6 class="mb-2">Bulk Edit</h6>
+                            <div class="mt-auto">
+                                <a href="{% url 'admin_dashboard:product_list' %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-edit me-1"></i> Manage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center p-3 border rounded h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <i class="fas fa-star fa-lg text-warning"></i>
+                            </div>
+                            <h6 class="mb-2">Reviews</h6>
+                            <div class="mt-auto">
+                                <a href="{% url 'admin_dashboard:review_list' %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-check me-1"></i> Moderate
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center p-3 border rounded h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <i class="fas fa-chart-bar fa-lg text-info"></i>
+                            </div>
+                            <h6 class="mb-2">Reports</h6>
+                            <div class="mt-auto">
+                                <a href="{% url 'admin_dashboard:pricing_dashboard' %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-chart-line me-1"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="text-center p-3 border rounded h-100 d-flex flex-column">
+                            <div class="mb-2">
+                                <i class="fas fa-ticket-alt fa-lg text-success"></i>
+                            </div>
+                            <h6 class="mb-2">Discount Coupons</h6>
+                            <div class="mt-auto">
+                                <a href="{% url 'admin_dashboard:coupon_list' %}" class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-gift me-1"></i> Manage
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-heartbeat text-info me-2"></i>
+                    System Status
+                </h3>
+            </div>
+            <div style="padding: 20px;">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="fas fa-server text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-semibold">Server</h6>
+                                <small class="text-success">Online & Healthy</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-info rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="fas fa-database text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-semibold">Database</h6>
+                                <small class="text-info">Connected</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <i class="fas fa-shield-alt text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-semibold">Security</h6>
+                                <small class="text-primary">Protected</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

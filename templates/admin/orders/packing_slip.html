@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packing Slip - Order {{ order.order_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: white;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .company-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        .document-title {
+            font-size: 20px;
+            color: #666;
+        }
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .info-section {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .info-section:last-child {
+            margin-right: 0;
+        }
+        .info-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .items-table th,
+        .items-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .items-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #495057;
+        }
+        .item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .item-sku {
+            color: #666;
+            font-size: 12px;
+        }
+        .quantity-box {
+            border: 2px solid #007bff;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            background: #f8f9ff;
+            min-width: 40px;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .notes {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .barcode-area {
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 15px;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="company-name">{{ company_name }}</div>
+        <div class="document-title">PACKING SLIP</div>
+    </div>
+
+    <!-- Order Information -->
+    <div class="order-info">
+        <div class="info-section">
+            <div class="info-title">Order Information</div>
+            <div><strong>Order ID:</strong> {{ order.order_id }}</div>
+            <div><strong>Order Date:</strong> {{ order.created_at|date:"M d, Y" }}</div>
+            <div><strong>Packing Date:</strong> {{ packing_date|date:"M d, Y" }}</div>
+            {% if order.tracking_number %}
+            <div><strong>Tracking:</strong> {{ order.tracking_number }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">Customer Details</div>
+            <div><strong>{{ order.user.get_full_name|default:order.user.username }}</strong></div>
+            <div>{{ order.email }}</div>
+            {% if order.phone %}
+            <div>{{ order.phone }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">Shipping Address</div>
+            {% if order.shipping_address %}
+            <div>{{ order.shipping_address.full_name }}</div>
+            <div>{{ order.shipping_address.street_address }}</div>
+            {% if order.shipping_address.apartment %}
+            <div>{{ order.shipping_address.apartment }}</div>
+            {% endif %}
+            <div>{{ order.shipping_address.city }}, {{ order.shipping_address.state }}</div>
+            <div>{{ order.shipping_address.postal_code }}</div>
+            {% else %}
+            <div>{{ order.address }}</div>
+            <div>{{ order.city }}, {{ order.postal_code }}</div>
+            <div>{{ order.country }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Order ID Barcode Area -->
+    <div class="barcode-area">
+        *{{ order.order_id }}*
+    </div>
+
+    <!-- Items Table -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 50%;">Item Description</th>
+                <th style="width: 15%;">SKU</th>
+                <th style="width: 15%; text-align: center;">Quantity</th>
+                <th style="width: 20%;">Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <td>
+                    <div class="item-name">{{ item.product.name }}</div>
+                    {% if item.product.brand %}
+                    <div class="item-sku">Brand: {{ item.product.brand }}</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div>{{ item.product.sku }}</div>
+                </td>
+                <td style="text-align: center;">
+                    <div class="quantity-box">{{ item.quantity }}</div>
+                </td>
+                <td>
+                    <!-- Space for packing notes -->
+                    <div style="height: 30px; border-bottom: 1px dotted #ccc;"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Order Summary -->
+    <div class="order-info">
+        <div class="info-section">
+            <div class="info-title">Order Summary</div>
+            <div><strong>Total Items:</strong> {{ order.get_total_items }} pieces</div>
+            <div><strong>Total Weight:</strong> ___________ kg</div>
+            <div><strong>Package Count:</strong> ___________ boxes</div>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">Quality Check</div>
+            <div>☐ All items present</div>
+            <div>☐ Items in good condition</div>
+            <div>☐ Correct quantities</div>
+            <div>☐ Proper packaging</div>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">Packed By</div>
+            <div>Name: ________________________</div>
+            <div>Date: ________________________</div>
+            <div>Signature: ____________________</div>
+        </div>
+    </div>
+
+    <!-- Special Instructions -->
+    <div class="notes">
+        <div class="info-title">Special Instructions</div>
+        <div style="min-height: 50px;">
+            {% if order.notes %}
+            {{ order.notes }}
+            {% else %}
+            No special instructions for this order.
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div style="text-align: center; color: #666; font-size: 12px;">
+            {{ company_name }} - Professional E-commerce Platform<br>
+            This packing slip was generated on {{ packing_date|date:"M d, Y H:i" }}
+        </div>
+    </div>
+
+    <!-- Print button (hidden when printing) -->
+    <div class="no-print" style="text-align: center; margin-top: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Print Packing Slip
+        </button>
+        <button onclick="window.close()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+            Close
+        </button>
+    </div>
+</body>
+</html>

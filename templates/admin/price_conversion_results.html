@@ -1,0 +1,112 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px;">
+    <h1>{{ title }}</h1>
+    
+    <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; color: #155724;">💱 Currency Conversion Preview</h3>
+        <p style="margin: 0; color: #155724;">
+            This is a preview of how your INR prices would look when converted to USD. 
+            No actual changes have been made to your products.
+        </p>
+    </div>
+
+    <div style="background: white; border-radius: 5px; border: 1px solid #ddd; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 15px; text-align: left; border-bottom: 1px solid #ddd; font-weight: bold;">Product Name</th>
+                    <th style="padding: 15px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">INR Price</th>
+                    <th style="padding: 15px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">USD Price</th>
+                    <th style="padding: 15px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">INR Original</th>
+                    <th style="padding: 15px; text-align: right; border-bottom: 1px solid #ddd; font-weight: bold;">USD Original</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in price_data %}
+                <tr style="{% cycle 'background: #f9f9f9;' '' %}">
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">
+                        <strong>{{ item.product }}</strong>
+                    </td>
+                    <td style="padding: 12px 15px; text-align: right; border-bottom: 1px solid #eee;">
+                        <span style="color: #007cba; font-weight: bold;">₹{{ item.inr_price }}</span>
+                    </td>
+                    <td style="padding: 12px 15px; text-align: right; border-bottom: 1px solid #eee;">
+                        <span style="color: #28a745; font-weight: bold;">${{ item.usd_price }}</span>
+                    </td>
+                    <td style="padding: 12px 15px; text-align: right; border-bottom: 1px solid #eee;">
+                        {% if item.inr_original %}
+                            <span style="color: #6c757d;">₹{{ item.inr_original }}</span>
+                        {% else %}
+                            <span style="color: #999;">-</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 15px; text-align: right; border-bottom: 1px solid #eee;">
+                        {% if item.usd_original %}
+                            <span style="color: #6c757d;">${{ item.usd_original }}</span>
+                        {% else %}
+                            <span style="color: #999;">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px; background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px;">
+        <h4 style="margin: 0 0 10px 0;">💡 Exchange Rate Information</h4>
+        <p style="margin: 0;">
+            <strong>Current Rate Used:</strong> 1 INR = 0.012 USD (approximately)<br>
+            <strong>Note:</strong> This is a simplified conversion for preview purposes. 
+            In a production environment, you would use real-time exchange rates from a financial API.
+        </p>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'admin:store_product_changelist' %}" 
+           style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; margin-right: 10px;">
+            ← Back to Products
+        </a>
+        
+        <button onclick="exportToCSV()" 
+                style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;">
+            📊 Export to CSV
+        </button>
+    </div>
+</div>
+
+<script>
+    function exportToCSV() {
+        const rows = [
+            ['Product Name', 'INR Price', 'USD Price', 'INR Original', 'USD Original']
+        ];
+        
+        {% for item in price_data %}
+        rows.push([
+            '{{ item.product|escapejs }}',
+            '{{ item.inr_price }}',
+            '{{ item.usd_price }}',
+            '{{ item.inr_original|default:"-" }}',
+            '{{ item.usd_original|default:"-" }}'
+        ]);
+        {% endfor %}
+        
+        let csvContent = rows.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "price_conversion_results.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}

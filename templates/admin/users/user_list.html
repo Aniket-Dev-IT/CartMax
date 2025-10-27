@@ -1,0 +1,255 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Users Management{% endblock %}
+
+{% block page_title %}Users Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.user-status-active { background: #d1fae5; color: #065f46; }
+.user-status-inactive { background: #fee2e2; color: #991b1b; }
+.user-type-staff { background: #dbeafe; color: #1e40af; }
+.user-type-customer { background: #f3e8ff; color: #7c2d12; }
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.user-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Summary -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_count }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="stat-value">{{ users|length }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-info-gradient">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Staff Members</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Customers</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="filters-bar">
+    <form method="get" class="row g-3">
+        <div class="col-lg-6 col-md-6">
+            <label for="search" class="form-label fw-bold">Search Users</label>
+            <input type="text" id="search" name="search" class="form-control search-box" 
+                   placeholder="Search by name, username, or email..." value="{{ search|default:'' }}">
+        </div>
+        
+        <div class="col-lg-3 col-md-3">
+            <label for="user_type" class="form-label fw-bold">User Type</label>
+            <select id="user_type" name="user_type" class="form-select filter-select">
+                <option value="">All Users</option>
+                <option value="staff" {% if user_type == 'staff' %}selected{% endif %}>Staff</option>
+                <option value="customers" {% if user_type == 'customers' %}selected{% endif %}>Customers</option>
+            </select>
+        </div>
+        
+        <div class="col-lg-3 col-md-3 d-flex align-items-end">
+            <div class="w-100">
+                <button type="submit" class="btn btn-professional w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="dashboard-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">
+            <i class="fas fa-users text-primary me-2"></i>
+            Users List
+        </h3>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th width="60px">Avatar</th>
+                    <th>User Details</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Joined</th>
+                    <th width="150px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        {% if user.profile.avatar %}
+                            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="user-avatar">
+                        {% else %}
+                            <div class="user-avatar-placeholder">
+                                {{ user.first_name|first|default:user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="product-name">
+                            {% if user.first_name and user.last_name %}
+                                {{ user.first_name }} {{ user.last_name }}
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
+                        </div>
+                        <div class="product-sku">@{{ user.username }}</div>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </td>
+                    <td>
+                        {% if user.is_staff %}
+                            <span class="badge status-badge user-type-staff">
+                                <i class="fas fa-user-tie me-1"></i>Staff
+                            </span>
+                        {% else %}
+                            <span class="badge status-badge user-type-customer">
+                                <i class="fas fa-user me-1"></i>Customer
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge status-badge user-status-active">Active</span>
+                        {% else %}
+                            <span class="badge status-badge user-status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.last_login %}
+                            <div>{{ user.last_login|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ user.last_login|time:"H:i" }}</small>
+                        {% else %}
+                            <span class="text-muted">Never</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ user.date_joined|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ user.date_joined|time:"H:i" }}</small>
+                    </td>
+                    <td class="action-buttons">
+                        <a href="{% url 'admin_dashboard:user_detail' user.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:user_edit' user.id %}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        {% if not user.is_superuser %}
+                            <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('Deactivate this user?')) toggleUserStatus({{ user.id }})">
+                                <i class="fas fa-user-times"></i>
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">No users match your search criteria.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="pagination-modern">
+    {% if page_obj.has_previous %}
+        <a href="?{% if search %}search={{ search }}&{% endif %}{% if user_type %}user_type={{ user_type }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="page-link active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% if search %}search={{ search }}&{% endif %}{% if user_type %}user_type={{ user_type }}&{% endif %}page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a href="?{% if search %}search={{ search }}&{% endif %}{% if user_type %}user_type={{ user_type }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-link">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleUserStatus(userId) {
+    // This would implement user activation/deactivation
+    console.log('Toggle user status:', userId);
+    // Implementation would go here
+}
+
+// Auto-submit form when filters change
+document.querySelectorAll('#user_type').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+
+// Search box with debouncing
+let searchTimeout;
+document.getElementById('search').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        this.form.submit();
+    }, 500);
+});
+</script>
+{% endblock %}

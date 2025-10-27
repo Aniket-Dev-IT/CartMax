@@ -1,0 +1,701 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form_type == 'register' %}Register{% else %}Sign In{% endif %} - CartMax{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-wrapper">
+        <!-- Left Side - Decorative Illustration -->
+        <div class="auth-side auth-side-left">
+            <div class="auth-illustration">
+                <div class="auth-branding">
+                    <h2 class="brand-title">Welcome to CartMax</h2>
+                    <p class="brand-subtitle">Your modern shopping destination with the latest products and unbeatable deals.</p>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">🛍️</div>
+                            <span>Thousands of Products</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🚚</div>
+                            <span>Fast & Free Delivery</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔒</div>
+                            <span>Secure Shopping</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">⭐</div>
+                            <span>Trusted by Customers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side - Auth Forms -->
+        <div class="auth-side auth-side-right">
+            <div class="auth-card">
+                <!-- CartMax Logo -->
+                <div class="text-center mb-4">
+                    <div class="auth-logo">
+                        <svg class="cartmax-logo-auth" viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="authCartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#1d4ed8;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <g>
+                                <rect x="10" y="12" width="56" height="56" rx="12" fill="url(#authCartGradient)" />
+                                <g id="bold-cart">
+                                    <path d="M 22 32 L 28 42 L 52 42 L 58 32" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M 25 32 L 55 32" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+                                    <circle cx="32" cy="48" r="2.5" fill="white" />
+                                    <circle cx="48" cy="48" r="2.5" fill="white" />
+                                </g>
+                            </g>
+                            
+                            <text x="78" y="54" font-family="'Outfit', sans-serif" font-size="38" font-weight="800" fill="#1e293b" letter-spacing="-1.2">
+                                CartMax
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Tab Toggles -->
+                <div class="auth-tabs mb-4">
+                    <button class="tab-btn tab-btn-active" data-tab="signin" id="signin-tab">
+                        <i class="fas fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <button class="tab-btn" data-tab="register" id="register-tab">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+
+                <!-- Sign In Form -->
+                <div class="tab-content active" id="signin-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Welcome Back</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'store:unified_auth' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="login">
+                                
+                                <!-- Email/Username -->
+                                <div class="mb-3">
+                                    <label for="login_username" class="form-label">Email or Username</label>
+                                    <input type="text" class="form-control" id="login_username" name="username" required autofocus>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label for="login_password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="login_password" name="password" required>
+                                </div>
+
+                                <!-- Remember Me -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="login_remember" name="remember">
+                                        <label class="form-check-label" for="login_remember">
+                                            Keep me signed in
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-cartmax btn-lg w-100">
+                                    Sign In
+                                </button>
+                            </form>
+
+                            <!-- Forgot Password Link -->
+                            <div class="text-center mt-3">
+                                <a href="#" class="text-decoration-none text-muted-link" onclick="alert('Password reset feature coming soon!')">
+                                    Forgot your password?
+                                </a>
+                            </div>
+
+                            <!-- Display Login Errors -->
+                            {% if login_errors %}
+                            <div class="alert alert-danger mt-3">
+                                {% for error in login_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div class="tab-content" id="register-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Create Account</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'store:unified_auth' %}" class="needs-validation" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="register">
+                                
+                                <!-- First Name -->
+                                <div class="mb-3">
+                                    <label for="reg_first_name" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="reg_first_name" name="first_name" required>
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="mb-3">
+                                    <label for="reg_last_name" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="reg_last_name" name="last_name" required>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label for="reg_email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="reg_email" name="email" required>
+                                </div>
+
+                                <!-- Username -->
+                                <div class="mb-3">
+                                    <label for="reg_username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="reg_username" name="username" required minlength="3">
+                                    <small class="form-text text-muted">3-150 characters</small>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label for="reg_password1" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="reg_password1" name="password1" required minlength="8">
+                                    <small class="form-text text-muted">At least 8 characters</small>
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="mb-3">
+                                    <label for="reg_password2" class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="reg_password2" name="password2" required>
+                                </div>
+
+                                <!-- Terms Agreement -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="reg_terms" name="terms" required>
+                                        <label class="form-check-label" for="reg_terms">
+                                            I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
+                                            and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-cartmax btn-lg w-100">
+                                    Create Account
+                                </button>
+                            </form>
+
+                            <!-- Display Register Errors -->
+                            {% if register_errors %}
+                            <div class="alert alert-danger mt-3">
+                                <ul class="mb-0">
+                                    {% for error in register_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue as Guest -->
+                <div class="text-center mt-4">
+                    <p class="mb-0 text-muted">
+                        <a href="{% url 'store:homepage' %}" class="text-decoration-none">Continue as Guest</a>
+                    </p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Unified Auth Page Styles */
+.auth-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.6s ease-out;
+}
+
+.auth-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 3rem;
+}
+
+.auth-side-left {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.auth-illustration {
+    width: 100%;
+    text-align: center;
+}
+
+.auth-branding {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.brand-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(8px);
+}
+
+.feature-icon {
+    font-size: 1.5rem;
+    min-width: 2rem;
+    text-align: center;
+}
+
+.auth-side-right {
+    background: white;
+    padding: 3rem 2rem;
+}
+
+.auth-card {
+    width: 100%;
+    animation: slideUp 0.6s ease-out;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+.cartmax-logo-auth {
+    width: auto;
+    height: 3.5rem;
+    max-width: 280px;
+}
+
+/* Tab Navigation */
+.auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 12px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+    padding: 0.875rem 1rem;
+    border: 2px solid transparent;
+    background: white;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.tab-btn:hover {
+    background: #f9fafb;
+    color: #1f2937;
+}
+
+.tab-btn-active {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border-color: #2563eb;
+}
+
+.tab-btn i {
+    font-size: 0.9rem;
+}
+
+/* Card Styles */
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border-bottom: none;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Form Elements */
+.form-label {
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.form-control:invalid.was-validated {
+    border-color: #ef4444;
+}
+
+.form-control:invalid.was-validated:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Button Styles */
+.btn-cartmax {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.3);
+    font-family: 'DM Sans', sans-serif;
+}
+
+.btn-cartmax:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-cartmax:active {
+    transform: translateY(0);
+}
+
+.btn-cartmax:focus {
+    outline: none;
+    text-decoration: none;
+}
+
+/* Form Check */
+.form-check-input {
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    transition: all 0.2s;
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.125em;
+}
+
+.form-check-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+.form-check-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+    outline: none;
+}
+
+.form-check-label {
+    font-weight: 400;
+    color: #4b5563;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* Alert Styles */
+.alert-danger {
+    background-color: #fee2e2;
+    border: 2px solid #fecaca;
+    color: #dc2626;
+    border-radius: 12px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.alert-danger ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.alert-danger li {
+    margin-bottom: 0.5rem;
+}
+
+/* Links */
+.text-muted-link {
+    color: #64748b;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.text-muted-link:hover {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+/* Form Text */
+.form-text {
+    color: #64748b;
+    font-size: 0.875rem;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.text-muted {
+    color: #64748b !important;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .auth-wrapper {
+        grid-template-columns: 1fr;
+        margin: 0 1rem;
+        border-radius: 16px;
+    }
+    
+    .auth-side {
+        padding: 2rem 1.5rem;
+    }
+    
+    .auth-side-left {
+        display: none;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .cartmax-logo-auth {
+        height: 2.5rem;
+    }
+    
+    .form-control {
+        padding: 12px 16px;
+        font-size: 16px;
+    }
+    
+    .tab-btn {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-wrapper {
+        margin: 0 0.5rem;
+    }
+    
+    .auth-side {
+        padding: 1.5rem 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .cartmax-logo-auth {
+        height: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.dataset.tab;
+            
+            // Remove active class from all buttons and contents
+            tabBtns.forEach(b => b.classList.remove('tab-btn-active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to clicked button and corresponding content
+            this.classList.add('tab-btn-active');
+            document.getElementById(tabName + '-content').classList.add('active');
+            
+            // Store preference in sessionStorage
+            sessionStorage.setItem('activeTab', tabName);
+        });
+    });
+    
+    // Restore previous tab preference
+    const activeTab = sessionStorage.getItem('activeTab') || 'signin';
+    const activeBtn = document.querySelector(`[data-tab="${activeTab}"]`);
+    if (activeBtn) {
+        activeBtn.click();
+    }
+    
+    // Password validation for register
+    const password1 = document.getElementById('reg_password1');
+    const password2 = document.getElementById('reg_password2');
+    
+    if (password2) {
+        password2.addEventListener('input', function() {
+            if (this.value && password1.value !== this.value) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    }
+    
+    // Form validation
+    const registerForm = document.querySelector('form.needs-validation');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            // Check password matching
+            if (password1.value !== password2.value) {
+                e.preventDefault();
+                e.stopPropagation();
+                password2.classList.add('is-invalid');
+            }
+            
+            // Standard validation
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            this.classList.add('was-validated');
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px;">
+    <h1>{{ title }}</h1>
+    
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3>Selected Products ({{ products|length }})</h3>
+        <ul style="max-height: 200px; overflow-y: auto; background: white; padding: 10px; border-radius: 3px;">
+            {% for product in products %}
+                <li>
+                    <strong>{{ product.name }}</strong> - 
+                    Current Price: ₹{{ product.price }}
+                    {% if product.original_price %}
+                        (Original: ₹{{ product.original_price }})
+                    {% else %}
+                        <span style="color: #666;">(No original price set)</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form method="post" style="background: white; padding: 20px; border-radius: 5px; border: 1px solid #ddd;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 20px;">
+            <h3>Discount Settings</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="discount_percentage" style="display: block; margin-bottom: 5px; font-weight: bold;">Discount Percentage:</label>
+                <input type="number" name="discount_percentage" id="discount_percentage" 
+                       min="0" max="90" step="0.1" placeholder="e.g., 10 for 10% discount" 
+                       style="padding: 8px; border: 1px solid #ccc; border-radius: 3px; width: 200px;" required>
+                <span style="margin-left: 5px; color: #666;">%</span>
+                <small style="display: block; color: #666; margin-top: 5px;">
+                    Enter discount percentage (0-90%). For example, 15 means 15% off.
+                </small>
+            </div>
+        </div>
+        
+        <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #155724;">📋 How this works:</h4>
+            <ul style="margin: 0; color: #155724;">
+                <li>If a product doesn't have an "original price", the current price will be set as the original price</li>
+                <li>The discount will be applied to the original price to calculate the new current price</li>
+                <li>This preserves your pricing structure for proper discount display</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <strong>⚠️ Important:</strong> This action will immediately apply discounts to all selected products. 
+            Products without an original price will have their current price stored as the original price first.
+        </div>
+        
+        <div>
+            <button type="submit" name="apply" value="1" 
+                    style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; margin-right: 10px;">
+                🏷️ Apply Discount
+            </button>
+            <a href="{% url 'admin:store_product_changelist' %}" 
+               style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px;">
+                Cancel
+            </a>
+        </div>
+    </form>
+    
+    <script>
+        // Calculate and show discount preview
+        document.getElementById('discount_percentage').addEventListener('input', function() {
+            const discountPercentage = parseFloat(this.value) || 0;
+            console.log(`Preview: ${discountPercentage}% discount will be applied to selected products`);
+        });
+    </script>
+</div>
+{% endblock %}

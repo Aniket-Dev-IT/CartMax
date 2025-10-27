@@ -1,0 +1,412 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Products Management{% endblock %}
+
+{% block page_title %}Products Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.table-modern {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.table-modern thead {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+.table-modern th {
+    font-weight: 600;
+    color: var(--dark-text);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 16px 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table-modern td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+}
+
+.product-name {
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 4px;
+}
+
+.product-sku {
+    font-size: 12px;
+    color: var(--light-text);
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-low-stock {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-out-stock {
+    background: #fecaca;
+    color: #b91c1c;
+}
+
+.price-display {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.action-buttons .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    margin-right: 4px;
+}
+
+.filters-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-box {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.search-box:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filter-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    background: white;
+}
+
+.pagination-modern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 32px;
+}
+
+.pagination-modern .page-link {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination-modern .page-link:hover,
+.pagination-modern .page-link.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Summary -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-value">{{ total_count }}</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ products|length }}</div>
+            <div class="stat-label">Showing</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Low Stock</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-danger-gradient">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Out of Stock</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="filters-bar">
+    <form method="get" class="row g-3">
+        <div class="col-lg-4 col-md-6">
+            <label for="search" class="form-label fw-bold">Search Products</label>
+            <input type="text" id="search" name="search" class="form-control search-box" 
+                   placeholder="Search by name, SKU, or brand..." value="{{ search|default:'' }}">
+        </div>
+        
+        <div class="col-lg-2 col-md-3">
+            <label for="status" class="form-label fw-bold">Status</label>
+            <select id="status" name="status" class="form-select filter-select">
+                <option value="">All Status</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+                <option value="low_stock" {% if status == 'low_stock' %}selected{% endif %}>Low Stock</option>
+                <option value="out_of_stock" {% if status == 'out_of_stock' %}selected{% endif %}>Out of Stock</option>
+            </select>
+        </div>
+        
+        <div class="col-lg-2 col-md-3">
+            <label for="category" class="form-label fw-bold">Category</label>
+            <select id="category" name="category" class="form-select filter-select">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="col-lg-2 col-md-6">
+            <label for="order_by" class="form-label fw-bold">Sort By</label>
+            <select id="order_by" name="order_by" class="form-select filter-select">
+                <option value="-created_at" {% if order_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                <option value="created_at" {% if order_by == 'created_at' %}selected{% endif %}>Oldest First</option>
+                <option value="name" {% if order_by == 'name' %}selected{% endif %}>Name A-Z</option>
+                <option value="-name" {% if order_by == '-name' %}selected{% endif %}>Name Z-A</option>
+                <option value="price" {% if order_by == 'price' %}selected{% endif %}>Price Low-High</option>
+                <option value="-price" {% if order_by == '-price' %}selected{% endif %}>Price High-Low</option>
+            </select>
+        </div>
+        
+        <div class="col-lg-2 col-md-6 d-flex align-items-end">
+            <div class="w-100">
+                <button type="submit" class="btn btn-professional w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Products Table -->
+<div class="dashboard-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">
+            <i class="fas fa-box text-primary me-2"></i>
+            Products List
+        </h3>
+        <div>
+            <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-professional">
+                <i class="fas fa-plus me-2"></i>Add New Product
+            </a>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th width="60px">Image</th>
+                    <th>Product Details</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th width="180px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        {% if product.main_image %}
+                            <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="product-image">
+                        {% else %}
+                            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="product-name">{{ product.name|truncatechars:40 }}</div>
+                        <div class="product-sku">SKU: {{ product.sku|default:"N/A" }}</div>
+                        {% if product.brand %}
+                            <small class="text-muted">{{ product.brand }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ product.category.name }}</span>
+                    </td>
+                    <td>
+                        <!-- INR Price -->
+                        {% if product.price_inr or product.price %}
+                            {% with inr_price=product.price_inr|default:product.price inr_discount=product.get_discount_percentage|default:0 %}
+                                <div class="price-display">₹{{ inr_price }}</div>
+                                {% if inr_discount > 0 %}
+                                    <small class="text-danger fw-bold">({{ inr_discount }}% OFF)</small>
+                                    {% if product.original_price_inr %}
+                                        <br/><small class="text-muted text-decoration-line-through">₹{{ product.original_price_inr }}</small>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                        
+                        <!-- USD Price -->
+                        {% if product.price_usd %}
+                            {% with usd_discount=product.get_discount_percentage|default:0 %}
+                                <div class="price-display mt-2" style="font-size: 0.9em; color: #666;">${{ product.price_usd }}</div>
+                                {% if usd_discount > 0 %}
+                                    <small class="text-danger fw-bold">({{ usd_discount }}% OFF)</small>
+                                    {% if product.original_price_usd %}
+                                        <br/><small class="text-muted text-decoration-line-through">${{ product.original_price_usd }}</small>
+                                    {% endif %}
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.stock == 0 %}
+                            <span class="badge status-badge status-out-stock">Out of Stock</span>
+                        {% elif product.stock <= 10 %}
+                            <span class="badge status-badge status-low-stock">{{ product.stock }} left</span>
+                        {% else %}
+                            <span class="text-success fw-bold">{{ product.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.available %}
+                            <span class="badge status-badge status-active">Active</span>
+                        {% else %}
+                            <span class="badge status-badge status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="action-buttons">
+                        <a href="{% url 'admin_dashboard:product_detail' product.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:product_delete' product.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No products found</h5>
+                        <p class="text-muted">Try adjusting your search or filters, or add a new product.</p>
+                        <a href="{% url 'admin_dashboard:product_create' %}" class="btn btn-professional">
+                            <i class="fas fa-plus me-2"></i>Add First Product
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="pagination-modern">
+    {% if page_obj.has_previous %}
+        <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if category_id %}category={{ category_id }}&{% endif %}{% if order_by %}order_by={{ order_by }}&{% endif %}page={{ page_obj.previous_page_number }}" class="page-link">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    {% endif %}
+    
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <span class="page-link active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if category_id %}category={{ category_id }}&{% endif %}{% if order_by %}order_by={{ order_by }}&{% endif %}page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    
+    {% if page_obj.has_next %}
+        <a href="?{% if search %}search={{ search }}&{% endif %}{% if status %}status={{ status }}&{% endif %}{% if category_id %}category={{ category_id }}&{% endif %}{% if order_by %}order_by={{ order_by }}&{% endif %}page={{ page_obj.next_page_number }}" class="page-link">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-submit form when filters change
+document.querySelectorAll('#status, #category, #order_by').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+
+// Search box with debouncing
+let searchTimeout;
+document.getElementById('search').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        this.form.submit();
+    }, 500);
+});
+</script>
+{% endblock %}

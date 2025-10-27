@@ -1,0 +1,1233 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}📊 System Logs & Monitoring - Real-time System Health{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="epic-card">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-monitor-heart-rate text-danger fa-2x me-3"></i>
+                        <div>
+                            <h1 class="mb-1">📊 System Logs & Monitoring</h1>
+                            <p class="text-muted mb-0">Real-time system health monitoring and comprehensive log analysis</p>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="system-status">
+                            <span class="status-indicator online"></span>
+                            <span class="status-text">System Online</span>
+                        </div>
+                        <button class="btn btn-outline-success" onclick="exportLogs()">
+                            <i class="fas fa-download"></i> Export Logs
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="clearOldLogs()">
+                            <i class="fas fa-broom"></i> Clear Old Logs
+                        </button>
+                        <button class="epic-button" onclick="refreshMonitoring()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Overview -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-lg-6">
+            <div class="epic-card health-card">
+                <div class="health-content">
+                    <div class="health-icon bg-success">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4 id="cpu-usage">0%</h4>
+                        <p class="mb-1">CPU Usage</p>
+                        <div class="health-bar">
+                            <div class="health-progress" id="cpu-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="epic-card health-card">
+                <div class="health-content">
+                    <div class="health-icon bg-info">
+                        <i class="fas fa-memory"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4 id="memory-usage">0%</h4>
+                        <p class="mb-1">Memory Usage</p>
+                        <div class="health-bar">
+                            <div class="health-progress" id="memory-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="epic-card health-card">
+                <div class="health-content">
+                    <div class="health-icon bg-warning">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4 id="disk-usage">0%</h4>
+                        <p class="mb-1">Disk Usage</p>
+                        <div class="health-bar">
+                            <div class="health-progress" id="disk-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-lg-6">
+            <div class="epic-card health-card">
+                <div class="health-content">
+                    <div class="health-icon bg-primary">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="health-info">
+                        <h4 id="response-time">0ms</h4>
+                        <p class="mb-1">Response Time</p>
+                        <div class="health-bar">
+                            <div class="health-progress" id="response-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Row -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="epic-card stats-card">
+                <div class="stats-content">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                    <div>
+                        <h3 id="error-count">0</h3>
+                        <p>Errors Today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="epic-card stats-card">
+                <div class="stats-content">
+                    <i class="fas fa-info-circle text-info"></i>
+                    <div>
+                        <h3 id="total-requests">0</h3>
+                        <p>Requests Today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="epic-card stats-card">
+                <div class="stats-content">
+                    <i class="fas fa-users text-success"></i>
+                    <div>
+                        <h3 id="active-sessions">0</h3>
+                        <p>Active Sessions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="epic-card stats-card">
+                <div class="stats-content">
+                    <i class="fas fa-clock text-warning"></i>
+                    <div>
+                        <h3 id="uptime">0h</h3>
+                        <p>System Uptime</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Log Panel -->
+        <div class="col-lg-8">
+            <!-- Log Filters -->
+            <div class="epic-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-filter text-info"></i> Log Filters</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Log Level</label>
+                            <select class="form-select" id="log-level-filter">
+                                <option value="all">All Levels</option>
+                                <option value="debug">Debug</option>
+                                <option value="info" selected>Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="error">Error</option>
+                                <option value="critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Source</label>
+                            <select class="form-select" id="source-filter">
+                                <option value="all">All Sources</option>
+                                <option value="django">Django</option>
+                                <option value="database">Database</option>
+                                <option value="auth">Authentication</option>
+                                <option value="api">API</option>
+                                <option value="payment">Payment</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Time Range</label>
+                            <select class="form-select" id="time-filter">
+                                <option value="1h">Last Hour</option>
+                                <option value="24h" selected>Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d">Last 30 Days</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Search</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="log-search" placeholder="Search logs...">
+                                <button class="btn btn-primary" onclick="filterLogs()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="auto-refresh" checked>
+                                <label class="form-check-label" for="auto-refresh">
+                                    Auto-refresh logs (every 5 seconds)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Log Stream -->
+            <div class="epic-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-stream text-success"></i> Live Log Stream</h3>
+                    <div class="log-controls">
+                        <button class="btn btn-sm btn-outline-success" onclick="pauseLogStream()" id="pause-btn">
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="btn btn-sm btn-outline-warning" onclick="clearLogDisplay()">
+                            <i class="fas fa-trash"></i> Clear Display
+                        </button>
+                    </div>
+                </div>
+                <div class="log-container">
+                    <div class="log-stream" id="log-stream">
+                        <div class="log-loading">
+                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                            Loading system logs...
+                        </div>
+                    </div>
+                </div>
+                <div class="log-footer">
+                    <small class="text-muted">
+                        Showing <span id="log-count">0</span> log entries | Last updated: <span id="last-updated">Never</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="col-lg-4">
+            <!-- System Alerts -->
+            <div class="epic-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-bell text-warning"></i> System Alerts</h3>
+                </div>
+                <div class="alerts-container">
+                    <div id="system-alerts">
+                        <div class="alert-item">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <span>System monitoring active</span>
+                            <small class="d-block text-muted">Just now</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Summary -->
+            <div class="epic-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-bug text-danger"></i> Error Summary</h3>
+                </div>
+                <div class="error-summary">
+                    <canvas id="errorChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Errors -->
+            <div class="epic-card mb-4">
+                <div class="card-header">
+                    <h3><i class="fas fa-list-ul text-warning"></i> Top Errors</h3>
+                </div>
+                <div class="top-errors" id="top-errors">
+                    <div class="error-item">
+                        <div class="error-details">
+                            <span class="error-type">Loading...</span>
+                            <small class="error-count">0 occurrences</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="epic-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-tools text-primary"></i> Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="restartService('web')">
+                        <i class="fas fa-redo"></i>
+                        Restart Web Server
+                    </button>
+                    <button class="action-btn" onclick="restartService('database')">
+                        <i class="fas fa-database"></i>
+                        Restart Database
+                    </button>
+                    <button class="action-btn" onclick="flushCache()">
+                        <i class="fas fa-broom"></i>
+                        Flush All Cache
+                    </button>
+                    <button class="action-btn" onclick="runHealthCheck()">
+                        <i class="fas fa-heartbeat"></i>
+                        Run Health Check
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">🔍 Log Entry Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="log-detail-content">
+                    <!-- Log details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="copyLogDetails()">
+                    <i class="fas fa-copy"></i> Copy Details
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: rgba(46, 213, 115, 0.1);
+        border-radius: 20px;
+        border: 1px solid #2ed573;
+    }
+    
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-indicator.online {
+        background: #2ed573;
+    }
+    
+    .status-indicator.offline {
+        background: #ff4757;
+    }
+    
+    .status-text {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2ed573;
+    }
+    
+    .health-card {
+        border-left: 4px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .health-card:hover {
+        border-left-color: #ffd700;
+        transform: translateY(-2px);
+    }
+    
+    .health-content {
+        display: flex;
+        align-items: center;
+        padding: 1.5rem;
+    }
+    
+    .health-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .health-info h4 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #fff;
+    }
+    
+    .health-info p {
+        font-size: 0.9rem;
+        color: #9aa0a6;
+        margin-bottom: 0.5rem;
+    }
+    
+    .health-bar {
+        width: 100%;
+        height: 4px;
+        background: #3c4043;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .health-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #2ed573, #ffd700);
+        border-radius: 2px;
+        transition: width 0.5s ease;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #2d2d30, #3c4043);
+        border: 1px solid #3c4043;
+    }
+    
+    .stats-content {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .stats-content i {
+        font-size: 2rem;
+        opacity: 0.7;
+    }
+    
+    .stats-content h3 {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #fff;
+    }
+    
+    .stats-content p {
+        margin: 0;
+        color: #9aa0a6;
+        font-size: 0.9rem;
+    }
+    
+    .card-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #3c4043;
+        background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .card-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .log-container {
+        max-height: 600px;
+        overflow-y: auto;
+        background: #1a1a1a;
+        border: 1px solid #3c4043;
+    }
+    
+    .log-stream {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: #e8eaed;
+    }
+    
+    .log-entry {
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid #2d2d30;
+        transition: background 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .log-entry:hover {
+        background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .log-entry.error {
+        border-left: 3px solid #ff4757;
+    }
+    
+    .log-entry.warning {
+        border-left: 3px solid #ffa502;
+    }
+    
+    .log-entry.info {
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .log-entry.debug {
+        border-left: 3px solid #9aa0a6;
+    }
+    
+    .log-entry.critical {
+        border-left: 3px solid #ff6b6b;
+        background: rgba(255, 107, 107, 0.1);
+    }
+    
+    .log-timestamp {
+        color: #9aa0a6;
+        margin-right: 0.5rem;
+    }
+    
+    .log-level {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    .log-level.error {
+        background: #ff4757;
+        color: white;
+    }
+    
+    .log-level.warning {
+        background: #ffa502;
+        color: white;
+    }
+    
+    .log-level.info {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .log-level.debug {
+        background: #9aa0a6;
+        color: white;
+    }
+    
+    .log-level.critical {
+        background: #ff6b6b;
+        color: white;
+    }
+    
+    .log-source {
+        color: #ffd700;
+        margin-right: 0.5rem;
+    }
+    
+    .log-message {
+        color: #e8eaed;
+    }
+    
+    .log-footer {
+        padding: 0.75rem 1rem;
+        background: #2d2d30;
+        border-top: 1px solid #3c4043;
+    }
+    
+    .log-loading {
+        padding: 2rem;
+        text-align: center;
+        color: #9aa0a6;
+    }
+    
+    .alerts-container {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .alert-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #3c4043;
+    }
+    
+    .alert-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .error-summary {
+        padding: 1rem;
+    }
+    
+    .top-errors {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .error-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #3c4043;
+    }
+    
+    .error-item:last-child {
+        border-bottom: none;
+    }
+    
+    .error-type {
+        font-weight: 500;
+        color: #ff4757;
+    }
+    
+    .error-count {
+        color: #9aa0a6;
+    }
+    
+    .quick-actions {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #2d2d30;
+        border: 1px solid #3c4043;
+        border-radius: 6px;
+        color: #e8eaed;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    
+    .action-btn:hover {
+        background: #3c4043;
+        border-color: #ffd700;
+        color: #ffd700;
+        transform: translateY(-1px);
+    }
+    
+    .log-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    /* Custom scrollbars */
+    .log-container::-webkit-scrollbar,
+    .alerts-container::-webkit-scrollbar,
+    .top-errors::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .log-container::-webkit-scrollbar-track,
+    .alerts-container::-webkit-scrollbar-track,
+    .top-errors::-webkit-scrollbar-track {
+        background: #2d2d30;
+    }
+    
+    .log-container::-webkit-scrollbar-thumb,
+    .alerts-container::-webkit-scrollbar-thumb,
+    .top-errors::-webkit-scrollbar-thumb {
+        background: #ffd700;
+        border-radius: 4px;
+    }
+    
+    .log-container::-webkit-scrollbar-thumb:hover,
+    .alerts-container::-webkit-scrollbar-thumb:hover,
+    .top-errors::-webkit-scrollbar-thumb:hover {
+        background: #ffed4a;
+    }
+    
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(46, 213, 115, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0);
+        }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .health-content {
+            padding: 1rem;
+        }
+        
+        .health-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+        
+        .health-info h4 {
+            font-size: 1.25rem;
+        }
+        
+        .log-container {
+            max-height: 400px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let logStreamPaused = false;
+    let autoRefreshInterval;
+    let errorChart;
+    let logCount = 0;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSystemMonitoring();
+    });
+    
+    function initializeSystemMonitoring() {
+        loadSystemHealth();
+        loadSystemStats();
+        initializeLogs();
+        initializeErrorChart();
+        setupAutoRefresh();
+        
+        console.log('📊 System Monitoring initialized');
+    }
+    
+    function loadSystemHealth() {
+        // Simulate system health metrics
+        const cpuUsage = Math.floor(Math.random() * 40) + 20; // 20-60%
+        const memoryUsage = Math.floor(Math.random() * 30) + 40; // 40-70%
+        const diskUsage = Math.floor(Math.random() * 20) + 30; // 30-50%
+        const responseTime = Math.floor(Math.random() * 150) + 50; // 50-200ms
+        
+        document.getElementById('cpu-usage').textContent = cpuUsage + '%';
+        document.getElementById('cpu-progress').style.width = cpuUsage + '%';
+        
+        document.getElementById('memory-usage').textContent = memoryUsage + '%';
+        document.getElementById('memory-progress').style.width = memoryUsage + '%';
+        
+        document.getElementById('disk-usage').textContent = diskUsage + '%';
+        document.getElementById('disk-progress').style.width = diskUsage + '%';
+        
+        document.getElementById('response-time').textContent = responseTime + 'ms';
+        document.getElementById('response-progress').style.width = Math.min(responseTime / 2, 100) + '%';
+        
+        // Update progress bar colors based on usage
+        updateHealthBarColor('cpu-progress', cpuUsage);
+        updateHealthBarColor('memory-progress', memoryUsage);
+        updateHealthBarColor('disk-progress', diskUsage);
+    }
+    
+    function updateHealthBarColor(elementId, percentage) {
+        const element = document.getElementById(elementId);
+        if (percentage > 80) {
+            element.style.background = 'linear-gradient(90deg, #ff4757, #ff6b6b)';
+        } else if (percentage > 60) {
+            element.style.background = 'linear-gradient(90deg, #ffa502, #ffd700)';
+        } else {
+            element.style.background = 'linear-gradient(90deg, #2ed573, #7bed9f)';
+        }
+    }
+    
+    function loadSystemStats() {
+        // Simulate system statistics
+        document.getElementById('error-count').textContent = Math.floor(Math.random() * 25) + 5;
+        document.getElementById('total-requests').textContent = (Math.floor(Math.random() * 5000) + 10000).toLocaleString();
+        document.getElementById('active-sessions').textContent = Math.floor(Math.random() * 200) + 50;
+        document.getElementById('uptime').textContent = Math.floor(Math.random() * 72) + 24 + 'h';
+    }
+    
+    function initializeLogs() {
+        loadInitialLogs();
+        setupLogFilters();
+    }
+    
+    function loadInitialLogs() {
+        const logStream = document.getElementById('log-stream');
+        logStream.innerHTML = '';
+        
+        // Generate sample logs
+        const logLevels = ['info', 'warning', 'error', 'debug', 'critical'];
+        const sources = ['django', 'database', 'auth', 'api', 'payment'];
+        const messages = [
+            'User authentication successful',
+            'Database connection established',
+            'Payment processing completed',
+            'Cache miss for key: products_list',
+            'API rate limit exceeded',
+            'SSL certificate expiring soon',
+            'Scheduled backup completed',
+            'Memory usage threshold reached',
+            'New user registration: user@example.com',
+            'Failed login attempt from IP: 192.168.1.100'
+        ];
+        
+        for (let i = 0; i < 50; i++) {
+            const level = logLevels[Math.floor(Math.random() * logLevels.length)];
+            const source = sources[Math.floor(Math.random() * sources.length)];
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            const timestamp = new Date(Date.now() - Math.random() * 86400000).toISOString();
+            
+            addLogEntry(timestamp, level, source, message);
+        }
+        
+        logCount = 50;
+        updateLogCount();
+    }
+    
+    function addLogEntry(timestamp, level, source, message, isNew = false) {
+        const logStream = document.getElementById('log-stream');
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${level}`;
+        logEntry.onclick = () => showLogDetail(timestamp, level, source, message);
+        
+        const formattedTime = new Date(timestamp).toLocaleString();
+        
+        logEntry.innerHTML = `
+            <span class="log-timestamp">[${formattedTime}]</span>
+            <span class="log-level ${level}">${level.toUpperCase()}</span>
+            <span class="log-source">${source}:</span>
+            <span class="log-message">${message}</span>
+        `;
+        
+        if (isNew) {
+            logEntry.style.background = 'rgba(255, 215, 0, 0.1)';
+            setTimeout(() => {
+                logEntry.style.background = '';
+            }, 2000);
+            logStream.insertBefore(logEntry, logStream.firstChild);
+        } else {
+            logStream.appendChild(logEntry);
+        }
+        
+        // Keep only last 1000 entries
+        const entries = logStream.querySelectorAll('.log-entry');
+        if (entries.length > 1000) {
+            entries[entries.length - 1].remove();
+        }
+    }
+    
+    function setupLogFilters() {
+        const filters = ['log-level-filter', 'source-filter', 'time-filter'];
+        filters.forEach(filterId => {
+            document.getElementById(filterId).addEventListener('change', filterLogs);
+        });
+        
+        // Search input with debounce
+        let searchTimeout;
+        document.getElementById('log-search').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterLogs, 300);
+        });
+    }
+    
+    function filterLogs() {
+        const levelFilter = document.getElementById('log-level-filter').value;
+        const sourceFilter = document.getElementById('source-filter').value;
+        const searchTerm = document.getElementById('log-search').value.toLowerCase();
+        
+        const logEntries = document.querySelectorAll('.log-entry');
+        let visibleCount = 0;
+        
+        logEntries.forEach(entry => {
+            const level = entry.querySelector('.log-level').textContent.toLowerCase();
+            const source = entry.querySelector('.log-source').textContent.replace(':', '').toLowerCase();
+            const message = entry.querySelector('.log-message').textContent.toLowerCase();
+            
+            const levelMatch = levelFilter === 'all' || level === levelFilter;
+            const sourceMatch = sourceFilter === 'all' || source === sourceFilter;
+            const searchMatch = !searchTerm || message.includes(searchTerm) || source.includes(searchTerm);
+            
+            if (levelMatch && sourceMatch && searchMatch) {
+                entry.style.display = 'block';
+                visibleCount++;
+            } else {
+                entry.style.display = 'none';
+            }
+        });
+        
+        updateLogCount(visibleCount);
+    }
+    
+    function setupAutoRefresh() {
+        const autoRefreshCheckbox = document.getElementById('auto-refresh');
+        
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            
+            autoRefreshInterval = setInterval(() => {
+                if (!logStreamPaused && autoRefreshCheckbox.checked) {
+                    simulateNewLogEntry();
+                    loadSystemHealth();
+                    updateLastUpdated();
+                }
+            }, 5000);
+        }
+        
+        autoRefreshCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                startAutoRefresh();
+            } else {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+        
+        startAutoRefresh();
+        updateLastUpdated();
+    }
+    
+    function simulateNewLogEntry() {
+        const logLevels = ['info', 'warning', 'error', 'debug'];
+        const sources = ['django', 'database', 'auth', 'api', 'payment'];
+        const messages = [
+            'New user session started',
+            'Database query executed successfully',
+            'API endpoint accessed',
+            'Cache invalidated',
+            'Background task completed',
+            'User logged out',
+            'Payment webhook received',
+            'Email sent successfully'
+        ];
+        
+        const level = logLevels[Math.floor(Math.random() * logLevels.length)];
+        const source = sources[Math.floor(Math.random() * sources.length)];
+        const message = messages[Math.floor(Math.random() * messages.length)];
+        const timestamp = new Date().toISOString();
+        
+        addLogEntry(timestamp, level, source, message, true);
+        logCount++;
+        updateLogCount();
+    }
+    
+    function initializeErrorChart() {
+        const ctx = document.getElementById('errorChart').getContext('2d');
+        errorChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'Error', 'Warning', 'Info'],
+                datasets: [{
+                    data: [2, 12, 28, 58],
+                    backgroundColor: ['#ff6b6b', '#ff4757', '#ffa502', '#3b82f6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#9aa0a6',
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        loadTopErrors();
+    }
+    
+    function loadTopErrors() {
+        const topErrors = [
+            { type: 'Database Connection Timeout', count: 15 },
+            { type: 'Authentication Failed', count: 8 },
+            { type: 'API Rate Limit Exceeded', count: 6 },
+            { type: 'Payment Gateway Error', count: 4 },
+            { type: 'File Upload Failed', count: 3 }
+        ];
+        
+        const container = document.getElementById('top-errors');
+        container.innerHTML = '';
+        
+        topErrors.forEach(error => {
+            const errorItem = document.createElement('div');
+            errorItem.className = 'error-item';
+            errorItem.innerHTML = `
+                <div class="error-details">
+                    <span class="error-type">${error.type}</span>
+                    <small class="error-count d-block">${error.count} occurrences</small>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+            `;
+            container.appendChild(errorItem);
+        });
+    }
+    
+    function showLogDetail(timestamp, level, source, message) {
+        const modalContent = document.getElementById('log-detail-content');
+        
+        modalContent.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Basic Information</h6>
+                    <table class="table table-dark table-sm">
+                        <tr>
+                            <td><strong>Timestamp:</strong></td>
+                            <td>${new Date(timestamp).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Level:</strong></td>
+                            <td><span class="log-level ${level}">${level.toUpperCase()}</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Source:</strong></td>
+                            <td>${source}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Message:</strong></td>
+                            <td>${message}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6>Additional Details</h6>
+                    <table class="table table-dark table-sm">
+                        <tr>
+                            <td><strong>Process ID:</strong></td>
+                            <td>${Math.floor(Math.random() * 10000) + 1000}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Thread ID:</strong></td>
+                            <td>${Math.floor(Math.random() * 100) + 1}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>User ID:</strong></td>
+                            <td>${Math.random() > 0.5 ? 'anonymous' : Math.floor(Math.random() * 1000) + 1}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IP Address:</strong></td>
+                            <td>192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <h6>Stack Trace</h6>
+                    <pre class="bg-dark p-3 rounded" style="color: #e8eaed; font-family: monospace; font-size: 0.8rem;">
+File "django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+File "django/core/handlers/base.py", line 179, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+File "myapp/views.py", line 42, in my_view
+    return render(request, 'template.html', context)
+${level === 'error' ? 'Exception: ' + message : 'Info: ' + message}
+                    </pre>
+                </div>
+            </div>
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('logDetailModal'));
+        modal.show();
+    }
+    
+    function pauseLogStream() {
+        const button = document.getElementById('pause-btn');
+        logStreamPaused = !logStreamPaused;
+        
+        if (logStreamPaused) {
+            button.innerHTML = '<i class="fas fa-play"></i> Resume';
+            button.classList.remove('btn-outline-success');
+            button.classList.add('btn-outline-warning');
+        } else {
+            button.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            button.classList.remove('btn-outline-warning');
+            button.classList.add('btn-outline-success');
+        }
+    }
+    
+    function clearLogDisplay() {
+        if (confirm('Are you sure you want to clear the log display? This will only clear the display, not the actual log files.')) {
+            document.getElementById('log-stream').innerHTML = '';
+            logCount = 0;
+            updateLogCount();
+            showNotification('📋 Log display cleared', 'info');
+        }
+    }
+    
+    function updateLogCount(visibleCount = null) {
+        const countElement = document.getElementById('log-count');
+        countElement.textContent = visibleCount !== null ? visibleCount : logCount;
+    }
+    
+    function updateLastUpdated() {
+        document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+    }
+    
+    function refreshMonitoring() {
+        loadSystemHealth();
+        loadSystemStats();
+        updateLastUpdated();
+        showNotification('🔄 Monitoring data refreshed', 'success');
+        addToSystemAlerts('Monitoring data refreshed manually', 'info');
+    }
+    
+    function exportLogs() {
+        showNotification('📥 Log export functionality - Coming in Phase 2B!', 'info');
+        addToSystemAlerts('Log export requested', 'info');
+    }
+    
+    function clearOldLogs() {
+        if (confirm('Are you sure you want to clear old log files? This action cannot be undone.')) {
+            showNotification('🧹 Old logs cleared successfully!', 'success');
+            addToSystemAlerts('Old log files cleared', 'warning');
+        }
+    }
+    
+    function restartService(serviceName) {
+        if (confirm(`Are you sure you want to restart the ${serviceName} service? This may cause temporary downtime.`)) {
+            showNotification(`🔄 ${serviceName} service restart initiated`, 'warning');
+            addToSystemAlerts(`${serviceName} service restart requested`, 'warning');
+            
+            // Simulate service restart
+            setTimeout(() => {
+                showNotification(`✅ ${serviceName} service restarted successfully`, 'success');
+                addToSystemAlerts(`${serviceName} service restarted successfully`, 'success');
+            }, 3000);
+        }
+    }
+    
+    function flushCache() {
+        if (confirm('Are you sure you want to flush all cache? This may temporarily impact performance.')) {
+            showNotification('🧹 Cache flush initiated', 'warning');
+            addToSystemAlerts('All cache flushed', 'info');
+            
+            setTimeout(() => {
+                showNotification('✅ Cache flushed successfully', 'success');
+            }, 2000);
+        }
+    }
+    
+    function runHealthCheck() {
+        showNotification('💓 Running comprehensive health check...', 'info');
+        addToSystemAlerts('Health check initiated', 'info');
+        
+        setTimeout(() => {
+            showNotification('✅ Health check completed - All systems operational', 'success');
+            addToSystemAlerts('Health check completed successfully', 'success');
+        }, 3000);
+    }
+    
+    function copyLogDetails() {
+        const content = document.getElementById('log-detail-content').textContent;
+        navigator.clipboard.writeText(content).then(() => {
+            showNotification('📋 Log details copied to clipboard', 'success');
+        });
+    }
+    
+    function addToSystemAlerts(message, type) {
+        const alertsContainer = document.getElementById('system-alerts');
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const iconMap = {
+            'success': 'fas fa-check-circle text-success',
+            'error': 'fas fa-exclamation-circle text-danger',
+            'warning': 'fas fa-exclamation-triangle text-warning',
+            'info': 'fas fa-info-circle text-info'
+        };
+        
+        const alertItem = document.createElement('div');
+        alertItem.className = 'alert-item';
+        alertItem.innerHTML = `
+            <i class="${iconMap[type]} me-2"></i>
+            <span>${message}</span>
+            <small class="d-block text-muted">${timestamp}</small>
+        `;
+        
+        alertsContainer.prepend(alertItem);
+        
+        // Keep only last 10 alerts
+        const alerts = alertsContainer.querySelectorAll('.alert-item');
+        if (alerts.length > 10) {
+            alerts[alerts.length - 1].remove();
+        }
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; width: 350px;';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+    });
+    
+    console.log('📊 System Logs & Monitoring Loaded Successfully!');
+</script>
+{% endblock %}

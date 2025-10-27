@@ -1,0 +1,131 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}User - {{ user.username }}{% endblock %}
+
+{% block page_title %}User Details - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-shopping-bag text-primary me-2"></i>
+                    Recent Orders
+                </h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-modern mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin_dashboard:order_detail' order.id %}" class="text-primary fw-bold">
+                                    #{{ order.order_id }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge status-badge order-status-{{ order.status }}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="fw-bold">₹{{ order.total }}</td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                No orders found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user text-primary me-2"></i>
+                    User Information
+                </h3>
+            </div>
+            <div class="card-body text-center">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" class="rounded-circle mb-3" width="100" height="100" alt="{{ user.username }}">
+                {% else %}
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 100px; height: 100px; font-size: 2rem;">
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    </div>
+                {% endif %}
+                
+                <h4 class="mb-1">
+                    {% if user.first_name and user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        {{ user.username }}
+                    {% endif %}
+                </h4>
+                <p class="text-muted">@{{ user.username }}</p>
+                
+                <hr>
+                
+                <div class="text-start">
+                    <div class="mb-3">
+                        <strong>Email:</strong> {{ user.email }}
+                    </div>
+                    {% if profile and profile.phone %}
+                    <div class="mb-3">
+                        <strong>Phone:</strong> {{ profile.phone }}
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <strong>User Type:</strong>
+                        {% if user.is_staff %}
+                            <span class="badge user-type-staff">Staff</span>
+                        {% else %}
+                            <span class="badge user-type-customer">Customer</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        {% if user.is_active %}
+                            <span class="badge user-status-active">Active</span>
+                        {% else %}
+                            <span class="badge user-status-inactive">Inactive</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Last Login:</strong>
+                        {% if user.last_login %}
+                            {{ user.last_login|date:"M d, Y H:i" }}
+                        {% else %}
+                            <span class="text-muted">Never</span>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Joined:</strong> {{ user.date_joined|date:"M d, Y" }}
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <a href="{% url 'admin_dashboard:user_edit' user.id %}" class="btn btn-professional w-100">
+                        <i class="fas fa-edit me-2"></i>Edit User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

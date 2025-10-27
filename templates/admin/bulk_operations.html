@@ -1,0 +1,814 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Bulk Operations - Mass Management Tools{% endblock %}
+
+{% block page_title %}Bulk Operations Center{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="d-flex align-items-center">
+                <div class="card-icon bg-warning-gradient me-3">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <h2 class="mb-1 text-primary">Bulk Operations Center</h2>
+                    <p class="text-muted mb-0">Powerful tools for mass management and operations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-info-gradient">
+                <i class="fas fa-check-square"></i>
+            </div>
+            <div class="stat-value" id="total-selected">0</div>
+            <div class="stat-label">Items Selected</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-value" id="last-operation-count">--</div>
+            <div class="stat-label">Last Operation</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value" id="operations-today">0</div>
+            <div class="stat-label">Operations Today</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-value" id="pending-tasks">0</div>
+            <div class="stat-label">Pending Tasks</div>
+        </div>
+    </div>
+</div>
+
+    <div class="row">
+        <!-- Main Operations Panel -->
+        <div class="col-md-8">
+            <!-- Model Selection -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-database text-primary me-2"></i>
+                        Select Data Type
+                    </h3>
+                </div>
+                <div class="card-body">
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="model_type" id="products" value="product" checked>
+                    <label class="btn btn-outline-warning" for="products">
+                        <i class="fas fa-box"></i> Products
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="model_type" id="orders" value="order">
+                    <label class="btn btn-outline-info" for="orders">
+                        <i class="fas fa-shopping-cart"></i> Orders
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="model_type" id="users" value="user">
+                    <label class="btn btn-outline-success" for="users">
+                        <i class="fas fa-users"></i> Users
+                    </label>
+                </div>
+                </div>
+            </div>
+
+            <!-- Advanced Search & Filter -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-search text-info me-2"></i>
+                        Advanced Search & Filter
+                    </h3>
+                </div>
+                <div class="card-body">
+                <form id="search-form">
+                    <div id="filter-container">
+                        <!-- Dynamic filters will be loaded here -->
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-primary" onclick="performSearch()">
+                                <i class="fas fa-search me-1"></i> Search & Load Results
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                                <i class="fas fa-times"></i> Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">
+                            <i class="fas fa-list text-success me-2"></i>
+                            Search Results
+                        </h3>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="selectAll()">
+                            <i class="fas fa-check-square"></i> Select All
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
+                            <i class="fas fa-square"></i> Clear Selection
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped" id="results-table">
+                        <thead id="table-head">
+                            <!-- Dynamic headers will be loaded here -->
+                        </thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td colspan="100%" class="text-center py-5">
+                                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Use the search filters above to load data</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <nav id="pagination-nav" class="mt-3" style="display: none;">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Operations Panel -->
+        <div class="col-md-4">
+            <!-- Bulk Actions -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-cogs text-danger me-2"></i> Bulk Actions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="bulk-actions">
+                        <!-- Dynamic bulk actions will be loaded here -->
+                        <p class="text-muted">Select items from the table to enable bulk actions</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="dashboard-card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-download text-primary me-2"></i> Export Data
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" onclick="exportData('csv')">
+                            <i class="fas fa-file-csv me-1"></i> Export as CSV
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="exportData('json')">
+                            <i class="fas fa-file-code me-1"></i> Export as JSON
+                        </button>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="export-selected-only">
+                            <label class="form-check-label" for="export-selected-only">
+                                Export selected items only
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Operations Log -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-history text-success me-2"></i> Recent Operations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div id="operations-log">
+                        <div class="operation-log-item">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <span>Ready for operations</span>
+                            <small class="d-block text-muted">System initialized</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">⚠️ Confirm Bulk Operation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmation-message">Are you sure you want to perform this operation?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    This action cannot be undone!
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-operation">Confirm Operation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">⚡ Processing Operation</h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="spinner-border text-warning mb-3" role="status">
+                    <span class="visually-hidden">Processing...</span>
+                </div>
+                <p id="progress-message">Processing your bulk operation...</p>
+                <div class="progress">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global variables
+    let currentModelType = 'product';
+    let selectedItems = new Set();
+    let searchResults = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        initializePage();
+        setupEventListeners();
+    });
+    
+    function initializePage() {
+        loadFilterForm();
+        updateBulkActions();
+        console.log('🛠️ Bulk Operations Center initialized');
+    }
+    
+    function setupEventListeners() {
+        // Model type change
+        document.querySelectorAll('input[name="model_type"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentModelType = this.value;
+                clearSelection();
+                loadFilterForm();
+                clearResults();
+            });
+        });
+    }
+    
+    function loadFilterForm() {
+        const filterContainer = document.getElementById('filter-container');
+        let filtersHTML = '';
+        
+        if (currentModelType === 'product') {
+            filtersHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="product-name" class="form-label">Product Name</label>
+                        <input type="text" class="form-control" id="product-name" name="name" placeholder="Search by name">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="product-category" class="form-label">Category</label>
+                        <input type="text" class="form-control" id="product-category" name="category" placeholder="Category name">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="min-price" class="form-label">Price Range</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="min-price" name="min_price" placeholder="Min" step="0.01">
+                            <span class="input-group-text">to</span>
+                            <input type="number" class="form-control" id="max-price" name="max_price" placeholder="Max" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="min-stock" class="form-label">Stock Range</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="min-stock" name="min_stock" placeholder="Min">
+                            <span class="input-group-text">to</span>
+                            <input type="number" class="form-control" id="max-stock" name="max_stock" placeholder="Max">
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (currentModelType === 'order') {
+            filtersHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="order-user" class="form-label">User</label>
+                        <input type="text" class="form-control" id="order-user" name="user" placeholder="Username">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="order-status" class="form-label">Status</label>
+                        <select class="form-select" id="order-status" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="min-total" class="form-label">Total Amount Range</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="min-total" name="min_total" placeholder="Min" step="0.01">
+                            <span class="input-group-text">to</span>
+                            <input type="number" class="form-control" id="max-total" name="max_total" placeholder="Max" step="0.01">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Date range would go here -->
+                    </div>
+                </div>
+            `;
+        } else if (currentModelType === 'user') {
+            filtersHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="user-search" class="form-label">Search Users</label>
+                        <input type="text" class="form-control" id="user-search" name="search" placeholder="Username, email, or name">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="user-status" class="form-label">Account Status</label>
+                        <select class="form-select" id="user-status" name="is_active">
+                            <option value="">All Users</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+        
+        filterContainer.innerHTML = filtersHTML;
+    }
+    
+    async function performSearch() {
+        const formData = new FormData(document.getElementById('search-form'));
+        const filters = {};
+        
+        for (let [key, value] of formData.entries()) {
+            if (value.trim()) {
+                filters[key] = value;
+            }
+        }
+        
+        try {
+            const response = await fetch('/admin-api/advanced-search/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    model_type: currentModelType,
+                    filters: filters,
+                    page: currentPage,
+                    per_page: 25
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.results) {
+                searchResults = data.results;
+                displayResults(data.results);
+                displayPagination(data.pagination);
+                console.log(`🔍 Found ${data.pagination.total_count} ${currentModelType}(s)`);
+            } else {
+                console.error('Search failed:', data.error);
+                showNotification('Search failed: ' + data.error, 'error');
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            showNotification('Search failed due to network error', 'error');
+        }
+    }
+    
+    function displayResults(results) {
+        const tableHead = document.getElementById('table-head');
+        const tableBody = document.getElementById('table-body');
+        
+        // Create headers
+        let headersHTML = '<tr><th><input type="checkbox" id="select-all"></th>';
+        
+        if (currentModelType === 'product') {
+            headersHTML += '<th>ID</th><th>Name</th><th>Price</th><th>Stock</th><th>Category</th><th>Created</th>';
+        } else if (currentModelType === 'order') {
+            headersHTML += '<th>ID</th><th>User</th><th>Total</th><th>Status</th><th>Created</th>';
+        } else if (currentModelType === 'user') {
+            headersHTML += '<th>ID</th><th>Username</th><th>Email</th><th>Full Name</th><th>Active</th><th>Joined</th>';
+        }
+        
+        headersHTML += '</tr>';
+        tableHead.innerHTML = headersHTML;
+        
+        // Create rows
+        let rowsHTML = '';
+        results.forEach(item => {
+            rowsHTML += `<tr>
+                <td><input type="checkbox" class="item-checkbox" value="${item.id}"></td>`;
+            
+            if (currentModelType === 'product') {
+                rowsHTML += `
+                    <td>${item.id}</td>
+                    <td>${item.name}</td>
+                    <td>$${item.price}</td>
+                    <td>${item.stock}</td>
+                    <td>${item.category}</td>
+                    <td>${item.created_at}</td>
+                `;
+            } else if (currentModelType === 'order') {
+                rowsHTML += `
+                    <td>${item.id}</td>
+                    <td>${item.user}</td>
+                    <td>$${item.total_amount}</td>
+                    <td><span class="badge bg-info">${item.status}</span></td>
+                    <td>${item.created_at}</td>
+                `;
+            } else if (currentModelType === 'user') {
+                const statusBadge = item.is_active ? 'bg-success">Active' : 'bg-secondary">Inactive';
+                rowsHTML += `
+                    <td>${item.id}</td>
+                    <td>${item.username}</td>
+                    <td>${item.email}</td>
+                    <td>${item.full_name}</td>
+                    <td><span class="badge ${statusBadge}</span></td>
+                    <td>${item.date_joined}</td>
+                `;
+            }
+            
+            rowsHTML += '</tr>';
+        });
+        
+        tableBody.innerHTML = rowsHTML;
+        
+        // Setup checkbox events
+        setupCheckboxEvents();
+    }
+    
+    function setupCheckboxEvents() {
+        const selectAllCheckbox = document.getElementById('select-all');
+        const itemCheckboxes = document.querySelectorAll('.item-checkbox');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+                if (this.checked) {
+                    selectedItems.add(checkbox.value);
+                } else {
+                    selectedItems.delete(checkbox.value);
+                }
+            });
+            updateBulkActions();
+        });
+        
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedItems.add(this.value);
+                } else {
+                    selectedItems.delete(this.value);
+                }
+                
+                selectAllCheckbox.checked = itemCheckboxes.length > 0 && 
+                    Array.from(itemCheckboxes).every(cb => cb.checked);
+                
+                updateBulkActions();
+            });
+        });
+    }
+    
+    function updateBulkActions() {
+        const bulkActionsContainer = document.getElementById('bulk-actions');
+        const selectedCount = selectedItems.size;
+        
+        document.getElementById('total-selected').textContent = selectedCount;
+        
+        if (selectedCount === 0) {
+            bulkActionsContainer.innerHTML = '<p class="text-muted">Select items from the table to enable bulk actions</p>';
+            return;
+        }
+        
+        let actionsHTML = `<p class="text-warning mb-3">${selectedCount} item(s) selected</p><div class="d-grid gap-2">`;
+        
+        if (currentModelType === 'product') {
+            actionsHTML += `
+                <button class="btn btn-danger" onclick="performBulkAction('delete')">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+                <button class="btn btn-warning" onclick="showBulkDiscountModal()">
+                    <i class="fas fa-percent"></i> Apply Discount
+                </button>
+                <button class="btn btn-success" onclick="performBulkAction('update_status', 'active')">
+                    <i class="fas fa-check"></i> Set Active
+                </button>
+                <button class="btn btn-secondary" onclick="performBulkAction('update_status', 'inactive')">
+                    <i class="fas fa-times"></i> Set Inactive
+                </button>
+            `;
+        } else if (currentModelType === 'order') {
+            actionsHTML += `
+                <button class="btn btn-danger" onclick="performBulkAction('delete')">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+                <button class="btn btn-info" onclick="performBulkAction('update_status', 'processing')">
+                    <i class="fas fa-cog"></i> Set Processing
+                </button>
+                <button class="btn btn-primary" onclick="performBulkAction('update_status', 'shipped')">
+                    <i class="fas fa-shipping-fast"></i> Set Shipped
+                </button>
+                <button class="btn btn-success" onclick="performBulkAction('update_status', 'delivered')">
+                    <i class="fas fa-check-circle"></i> Set Delivered
+                </button>
+            `;
+        } else if (currentModelType === 'user') {
+            actionsHTML += `
+                <button class="btn btn-success" onclick="performBulkAction('activate_users')">
+                    <i class="fas fa-user-check"></i> Activate Users
+                </button>
+                <button class="btn btn-warning" onclick="performBulkAction('deactivate_users')">
+                    <i class="fas fa-user-times"></i> Deactivate Users
+                </button>
+                <button class="btn btn-danger" onclick="performBulkAction('delete')">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+            `;
+        }
+        
+        actionsHTML += '</div>';
+        bulkActionsContainer.innerHTML = actionsHTML;
+    }
+    
+    async function performBulkAction(action, status = null) {
+        const selectedIds = Array.from(selectedItems);
+        
+        if (selectedIds.length === 0) {
+            showNotification('No items selected', 'warning');
+            return;
+        }
+        
+        // Show confirmation
+        const actionName = action.replace('_', ' ').toUpperCase();
+        document.getElementById('confirmation-message').textContent = 
+            `Are you sure you want to ${actionName} ${selectedIds.length} ${currentModelType}(s)?`;
+        
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        confirmModal.show();
+        
+        // Setup confirmation handler
+        document.getElementById('confirm-operation').onclick = async function() {
+            confirmModal.hide();
+            
+            const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+            progressModal.show();
+            
+            try {
+                const requestData = {
+                    model_type: currentModelType,
+                    action: action,
+                    ids: selectedIds
+                };
+                
+                if (status) {
+                    requestData.status = status;
+                }
+                
+                const response = await fetch('/admin-api/bulk-operations/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                progressModal.hide();
+                
+                if (result.success) {
+                    showNotification(result.message, 'success');
+                    document.getElementById('last-operation-count').textContent = result.affected_count;
+                    addToOperationsLog(result.message, 'success');
+                    
+                    // Refresh results
+                    clearSelection();
+                    performSearch();
+                } else {
+                    showNotification('Operation failed: ' + result.message, 'error');
+                    addToOperationsLog('Operation failed: ' + result.message, 'error');
+                }
+                
+            } catch (error) {
+                progressModal.hide();
+                showNotification('Network error: ' + error.message, 'error');
+                addToOperationsLog('Network error: ' + error.message, 'error');
+            }
+        };
+    }
+    
+    async function exportData(format) {
+        const exportSelectedOnly = document.getElementById('export-selected-only').checked;
+        const ids = exportSelectedOnly ? Array.from(selectedItems) : [];
+        
+        try {
+            const response = await fetch('/admin-api/bulk-export/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    model_type: currentModelType,
+                    format: format,
+                    ids: ids
+                })
+            });
+            
+            if (response.ok) {
+                // Download the file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentModelType}_export_${new Date().getTime()}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification(`${format.toUpperCase()} export completed successfully`, 'success');
+                addToOperationsLog(`Exported ${currentModelType} data as ${format.toUpperCase()}`, 'info');
+            } else {
+                const error = await response.json();
+                showNotification('Export failed: ' + error.error, 'error');
+            }
+            
+        } catch (error) {
+            showNotification('Export failed: ' + error.message, 'error');
+        }
+    }
+    
+    function clearSelection() {
+        selectedItems.clear();
+        document.querySelectorAll('.item-checkbox, #select-all').forEach(cb => cb.checked = false);
+        updateBulkActions();
+    }
+    
+    function selectAll() {
+        document.querySelectorAll('.item-checkbox').forEach(cb => {
+            cb.checked = true;
+            selectedItems.add(cb.value);
+        });
+        document.getElementById('select-all').checked = true;
+        updateBulkActions();
+    }
+    
+    function clearFilters() {
+        document.getElementById('search-form').reset();
+    }
+    
+    function clearResults() {
+        document.getElementById('table-body').innerHTML = `
+            <tr>
+                <td colspan="100%" class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Use the search filters above to load data</p>
+                </td>
+            </tr>
+        `;
+        document.getElementById('pagination-nav').style.display = 'none';
+    }
+    
+    function addToOperationsLog(message, type) {
+        const logContainer = document.getElementById('operations-log');
+        const timestamp = new Date().toLocaleTimeString();
+        
+        const iconMap = {
+            'success': 'fas fa-check-circle text-success',
+            'error': 'fas fa-exclamation-circle text-danger',
+            'info': 'fas fa-info-circle text-info',
+            'warning': 'fas fa-exclamation-triangle text-warning'
+        };
+        
+        const logItem = document.createElement('div');
+        logItem.className = 'operation-log-item';
+        logItem.innerHTML = `
+            <i class="${iconMap[type]} me-2"></i>
+            <span>${message}</span>
+            <small class="d-block text-muted">${timestamp}</small>
+        `;
+        
+        logContainer.prepend(logItem);
+        
+        // Keep only last 10 log items
+        const logItems = logContainer.querySelectorAll('.operation-log-item');
+        if (logItems.length > 10) {
+            logItems[logItems.length - 1].remove();
+        }
+    }
+    
+    function showNotification(message, type) {
+        // Create a simple notification
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; width: 300px;';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+    
+    function displayPagination(pagination) {
+        // Implementation for pagination display
+        const nav = document.getElementById('pagination-nav');
+        nav.style.display = pagination.total_pages > 1 ? 'block' : 'none';
+        
+        if (pagination.total_pages > 1) {
+            let paginationHTML = '';
+            
+            // Previous button
+            if (pagination.has_previous) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${pagination.page - 1})">Previous</a></li>`;
+            }
+            
+            // Page numbers
+            for (let i = 1; i <= pagination.total_pages; i++) {
+                const active = i === pagination.page ? 'active' : '';
+                paginationHTML += `<li class="page-item ${active}"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`;
+            }
+            
+            // Next button
+            if (pagination.has_next) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${pagination.page + 1})">Next</a></li>`;
+            }
+            
+            document.getElementById('pagination').innerHTML = paginationHTML;
+        }
+    }
+    
+    function changePage(page) {
+        currentPage = page;
+        performSearch();
+    }
+    
+    console.log('🛠️ Bulk Operations Management System Loaded Successfully!');
+</script>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Edit Review{% endblock %}
+
+{% block page_title %}Edit Review{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-edit text-primary me-2"></i>
+                    Edit Review
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Product Information (Read-only) -->
+                    <div class="d-flex align-items-start mb-4 p-3 bg-light rounded">
+                        {% if review.product.main_image %}
+                            <img src="{{ review.product.main_image.url }}" class="me-3" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" alt="{{ review.product.name }}">
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-1">{{ review.product.name }}</h6>
+                            <small class="text-muted">{{ review.product.category.name }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_rating" class="form-label fw-bold">Rating *</label>
+                            {{ form.rating }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_is_approved" class="form-label fw-bold">Status</label>
+                            <select name="is_approved" id="id_is_approved" class="form-select">
+                                <option value="False" {% if not review.is_approved %}selected{% endif %}>Pending Review</option>
+                                <option value="True" {% if review.is_approved %}selected{% endif %}>Approved</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_title" class="form-label fw-bold">Review Title</label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_comment" class="form-label fw-bold">Review Comment *</label>
+                        {{ form.comment }}
+                    </div>
+                    
+                    <!-- Admin Response Section -->
+                    <div class="mt-4 p-3 border rounded">
+                        <h6 class="mb-3">
+                            <i class="fas fa-reply text-info me-2"></i>
+                            Admin Response (Optional)
+                        </h6>
+                        <div class="mb-3">
+                            <label for="id_admin_response" class="form-label">Response to Customer</label>
+                            <textarea name="admin_response" id="id_admin_response" class="form-control" rows="4" 
+                                      placeholder="Write a response to the customer's review...">{{ review.admin_response|default:"" }}</textarea>
+                            <small class="form-text text-muted">This response will be visible to customers on the product page</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Review Metadata -->
+                    <div class="row mt-4 pt-3 border-top">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <strong>Customer:</strong> {{ review.user.get_full_name|default:review.user.username }}<br>
+                                <strong>Original Date:</strong> {{ review.created_at|date:"M d, Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <strong>Last Modified:</strong> {{ review.updated_at|date:"M d, Y H:i" }}<br>
+                                <strong>Status:</strong> 
+                                {% if review.is_approved %}
+                                    <span class="text-success">Approved</span>
+                                {% else %}
+                                    <span class="text-warning">Pending</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-professional">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{% url 'admin_dashboard:review_detail' review.id %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-eye me-2"></i>View Review
+                            </a>
+                            <a href="{% url 'admin_dashboard:review_list' %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Review Guidelines
+                </h3>
+            </div>
+            <div class="card-body">
+                <h6>Moderation Tips</h6>
+                <ul class="mb-3">
+                    <li>Check for inappropriate language or spam</li>
+                    <li>Verify the review is about the product</li>
+                    <li>Look for fake or biased reviews</li>
+                    <li>Ensure the rating matches the comment</li>
+                </ul>
+                
+                <h6>Response Guidelines</h6>
+                <ul>
+                    <li>Be professional and courteous</li>
+                    <li>Address specific concerns mentioned</li>
+                    <li>Thank customers for positive feedback</li>
+                    <li>Offer solutions for negative reviews</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="dashboard-card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-bolt text-warning me-2"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post" class="d-grid gap-2">
+                    {% csrf_token %}
+                    
+                    {% if not review.is_approved %}
+                    <button type="submit" name="quick_action" value="approve" class="btn btn-success btn-sm">
+                        <i class="fas fa-check me-1"></i>Quick Approve
+                    </button>
+                    {% else %}
+                    <button type="submit" name="quick_action" value="unapprove" class="btn btn-warning btn-sm">
+                        <i class="fas fa-pause me-1"></i>Set Pending
+                    </button>
+                    {% endif %}
+                    
+                    <button type="submit" name="quick_action" value="flag" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Flag this review as inappropriate?')">
+                        <i class="fas fa-flag me-1"></i>Flag as Inappropriate
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Auto-save draft functionality
+let saveTimeout;
+const form = document.querySelector('form');
+const inputs = form.querySelectorAll('input, textarea, select');
+
+inputs.forEach(input => {
+    input.addEventListener('input', function() {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(saveDraft, 2000);
+    });
+});
+
+function saveDraft() {
+    // Implementation for auto-saving drafts
+    console.log('Auto-saving draft...');
+}
+
+// Rating preview
+const ratingSelect = document.getElementById('id_rating');
+if (ratingSelect) {
+    ratingSelect.addEventListener('change', function() {
+        updateRatingPreview(this.value);
+    });
+}
+
+function updateRatingPreview(rating) {
+    // Could add a star preview here
+    console.log('Rating changed to:', rating);
+}
+</script>
+{% endblock %}
+{% endblock %}

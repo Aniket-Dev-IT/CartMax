@@ -1,0 +1,870 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}📥 Product Import - Bulk Import System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="epic-card">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-file-import text-success fa-2x me-3"></i>
+                    <div>
+                        <h1 class="mb-1">📥 Product Import System</h1>
+                        <p class="text-muted mb-0">Bulk import products from CSV or Excel files</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Steps Progress -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="epic-card">
+                <h3><i class="fas fa-tasks text-info"></i> Import Process</h3>
+                <div class="import-steps">
+                    <div class="step-indicator">
+                        <div class="step active" id="step-1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Upload File</div>
+                        </div>
+                        <div class="step" id="step-2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Validate Data</div>
+                        </div>
+                        <div class="step" id="step-3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Configure Import</div>
+                        </div>
+                        <div class="step" id="step-4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Execute Import</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Import Panel -->
+        <div class="col-md-8">
+            <!-- Step 1: File Upload -->
+            <div id="upload-section" class="epic-card mb-4">
+                <h3><i class="fas fa-cloud-upload-alt text-primary"></i> Upload Import File</h3>
+                
+                <div class="file-format-info mb-4">
+                    <h5>Supported File Formats:</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="format-card">
+                                <i class="fas fa-file-csv fa-3x text-success mb-2"></i>
+                                <h6>CSV Files</h6>
+                                <p class="small text-muted">Comma-separated values (.csv)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="format-card">
+                                <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
+                                <h6>Excel Files</h6>
+                                <p class="small text-muted">Excel workbooks (.xlsx, .xls)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="expected-format mb-4">
+                    <h5>Expected Column Format:</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Column A</th>
+                                    <th>Column B</th>
+                                    <th>Column C</th>
+                                    <th>Column D</th>
+                                    <th>Column E</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Product Name*</strong></td>
+                                    <td>Description</td>
+                                    <td><strong>Price*</strong></td>
+                                    <td>Stock</td>
+                                    <td>Category</td>
+                                </tr>
+                                <tr class="text-muted">
+                                    <td>Gaming Laptop</td>
+                                    <td>High-performance laptop</td>
+                                    <td>1299.99</td>
+                                    <td>50</td>
+                                    <td>Electronics</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-warning small"><strong>*</strong> Required fields</p>
+                </div>
+
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt fa-4x text-muted mb-3"></i>
+                        <h4>Drop your file here or click to browse</h4>
+                        <p class="text-muted">Maximum file size: 10MB</p>
+                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" style="display: none;">
+                        <button type="button" class="epic-button" onclick="document.getElementById('file-input').click()">
+                            <i class="fas fa-folder-open"></i> Choose File
+                        </button>
+                    </div>
+                </div>
+
+                <div id="file-info" class="file-info mt-3" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-file me-2"></i>
+                        <span id="file-name"></span>
+                        <span class="float-end" id="file-size"></span>
+                    </div>
+                    <button type="button" class="epic-button" onclick="uploadFile()">
+                        <i class="fas fa-upload"></i> Process File
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="clearFile()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Validation Results -->
+            <div id="validation-section" class="epic-card mb-4" style="display: none;">
+                <h3><i class="fas fa-check-double text-warning"></i> Validation Results</h3>
+                
+                <div id="validation-summary" class="validation-summary mb-4">
+                    <!-- Validation summary will be inserted here -->
+                </div>
+
+                <div id="preview-section" class="mb-4">
+                    <h5>Data Preview (First 10 rows)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped" id="preview-table">
+                            <thead id="preview-headers">
+                                <!-- Headers will be inserted here -->
+                            </thead>
+                            <tbody id="preview-body">
+                                <!-- Preview rows will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="validation-errors" class="validation-errors">
+                    <!-- Validation errors will be inserted here -->
+                </div>
+
+                <div class="text-center">
+                    <button type="button" class="epic-button" onclick="proceedToConfiguration()">
+                        <i class="fas fa-arrow-right"></i> Proceed to Configuration
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="resetImport()">
+                        <i class="fas fa-undo"></i> Upload New File
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Import Configuration -->
+            <div id="configuration-section" class="epic-card mb-4" style="display: none;">
+                <h3><i class="fas fa-cogs text-info"></i> Import Configuration</h3>
+                
+                <form id="import-config-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="update-existing" checked>
+                                <label class="form-check-label" for="update-existing">
+                                    <strong>Update Existing Products</strong><br>
+                                    <small class="text-muted">Update products if they already exist (match by name)</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="create-categories" checked>
+                                <label class="form-check-label" for="create-categories">
+                                    <strong>Create New Categories</strong><br>
+                                    <small class="text-muted">Automatically create categories if they don't exist</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="skip-invalid">
+                                <label class="form-check-label" for="skip-invalid">
+                                    <strong>Skip Invalid Rows</strong><br>
+                                    <small class="text-muted">Continue import even if some rows have errors</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="generate-slugs" checked>
+                                <label class="form-check-label" for="generate-slugs">
+                                    <strong>Auto-Generate Slugs</strong><br>
+                                    <small class="text-muted">Automatically create URL-friendly slugs from product names</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-danger btn-lg" onclick="executeImport()">
+                        <i class="fas fa-play"></i> Execute Import
+                    </button>
+                    <button type="button" class="btn btn-secondary ms-2" onclick="backToValidation()">
+                        <i class="fas fa-arrow-left"></i> Back to Validation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Import Results -->
+            <div id="results-section" class="epic-card mb-4" style="display: none;">
+                <h3><i class="fas fa-check-circle text-success"></i> Import Complete</h3>
+                
+                <div id="import-results" class="import-results">
+                    <!-- Results will be inserted here -->
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'admin:store_product_changelist' %}" class="epic-button">
+                        <i class="fas fa-list"></i> View Products
+                    </a>
+                    <button type="button" class="btn btn-primary ms-2" onclick="startNewImport()">
+                        <i class="fas fa-plus"></i> Import More Products
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="col-md-4">
+            <!-- Import Statistics -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-chart-bar text-warning"></i> Import Statistics</h3>
+                <div id="import-stats">
+                    <div class="stat-item d-flex justify-content-between">
+                        <span>Total Rows:</span>
+                        <span id="stat-total">0</span>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between">
+                        <span>Valid Rows:</span>
+                        <span id="stat-valid" class="text-success">0</span>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between">
+                        <span>Invalid Rows:</span>
+                        <span id="stat-invalid" class="text-danger">0</span>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between">
+                        <span>Warnings:</span>
+                        <span id="stat-warnings" class="text-warning">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Tips -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-lightbulb text-info"></i> Import Tips</h3>
+                <div class="tips-list">
+                    <div class="tip-item">
+                        <i class="fas fa-check text-success me-2"></i>
+                        <span>Ensure product names are unique</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check text-success me-2"></i>
+                        <span>Use decimal format for prices (e.g., 29.99)</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check text-success me-2"></i>
+                        <span>Stock values should be whole numbers</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-check text-success me-2"></i>
+                        <span>Category names will be auto-created if enabled</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-exclamation text-warning me-2"></i>
+                        <span>Large imports may take several minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Import History -->
+            <div class="epic-card">
+                <h3><i class="fas fa-history text-secondary"></i> Import History</h3>
+                <div id="import-history">
+                    <p class="text-muted">No recent imports</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="importProgressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">⚡ Processing Import</h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="spinner-border text-success mb-3" role="status">
+                    <span class="visually-hidden">Processing...</span>
+                </div>
+                <p id="import-progress-message">Processing your product import...</p>
+                <div class="progress">
+                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                </div>
+                <p class="text-muted mt-2">Please do not close this window</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .import-steps {
+        margin: 20px 0;
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+    
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 40px;
+        right: 40px;
+        height: 2px;
+        background: #3c4043;
+        z-index: 1;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        background: #202124;
+        padding: 0 10px;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #3c4043;
+        color: #9aa0a6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    
+    .step.active .step-number {
+        background: #ffd700;
+        color: #000;
+    }
+    
+    .step.completed .step-number {
+        background: #2ed573;
+        color: #fff;
+    }
+    
+    .step-label {
+        font-size: 12px;
+        text-align: center;
+        color: #9aa0a6;
+    }
+    
+    .step.active .step-label {
+        color: #ffd700;
+        font-weight: bold;
+    }
+    
+    .upload-area {
+        border: 2px dashed #3c4043;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-area:hover {
+        border-color: #ffd700;
+        background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .upload-area.dragover {
+        border-color: #ffd700;
+        background: rgba(255, 215, 0, 0.1);
+    }
+    
+    .format-card {
+        text-align: center;
+        padding: 20px;
+        border: 1px solid #3c4043;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .validation-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .validation-card {
+        text-align: center;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #3c4043;
+    }
+    
+    .validation-card.valid {
+        background: rgba(46, 213, 115, 0.1);
+        border-color: #2ed573;
+    }
+    
+    .validation-card.invalid {
+        background: rgba(255, 71, 87, 0.1);
+        border-color: #ff4757;
+    }
+    
+    .validation-card.warning {
+        background: rgba(255, 215, 0, 0.1);
+        border-color: #ffd700;
+    }
+    
+    .stat-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #3c4043;
+    }
+    
+    .tip-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    
+    .file-info {
+        text-align: center;
+    }
+    
+    .import-results {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+    }
+    
+    .result-card {
+        text-align: center;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #3c4043;
+    }
+    
+    .result-card.created {
+        background: rgba(46, 213, 115, 0.1);
+        border-color: #2ed573;
+    }
+    
+    .result-card.updated {
+        background: rgba(255, 215, 0, 0.1);
+        border-color: #ffd700;
+    }
+    
+    .result-card.skipped {
+        background: rgba(154, 160, 166, 0.1);
+        border-color: #9aa0a6;
+    }
+    
+    .result-card.errors {
+        background: rgba(255, 71, 87, 0.1);
+        border-color: #ff4757;
+    }
+</style>
+
+<script>
+    let currentFile = null;
+    let currentFileId = null;
+    let validationResults = null;
+    let importStep = 1;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeImportSystem();
+    });
+    
+    function initializeImportSystem() {
+        setupFileUpload();
+        updateStepIndicator(1);
+        console.log('📥 Product Import System initialized');
+    }
+    
+    function setupFileUpload() {
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        
+        // File input change event
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                currentFile = e.target.files[0];
+                showFileInfo(currentFile);
+            }
+        });
+        
+        // Drag and drop events
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                currentFile = files[0];
+                showFileInfo(currentFile);
+            }
+        });
+        
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
+    
+    function showFileInfo(file) {
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.style.display = 'block';
+    }
+    
+    function clearFile() {
+        currentFile = null;
+        document.getElementById('file-input').value = '';
+        document.getElementById('file-info').style.display = 'none';
+    }
+    
+    async function uploadFile() {
+        if (!currentFile) {
+            showNotification('Please select a file first', 'warning');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', currentFile);
+        
+        try {
+            showProgressModal('Uploading and validating file...');
+            
+            const response = await fetch('/admin-api/product-import/upload/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            hideProgressModal();
+            
+            if (result.success) {
+                currentFileId = result.file_id;
+                validationResults = result;
+                
+                showValidationResults(result);
+                updateStepIndicator(2);
+                
+                // Hide upload section and show validation section
+                document.getElementById('upload-section').style.display = 'none';
+                document.getElementById('validation-section').style.display = 'block';
+                
+                console.log('✅ File validated successfully');
+            } else {
+                showNotification('Upload failed: ' + result.error, 'error');
+            }
+            
+        } catch (error) {
+            hideProgressModal();
+            showNotification('Upload failed: ' + error.message, 'error');
+        }
+    }
+    
+    function showValidationResults(results) {
+        // Update statistics
+        document.getElementById('stat-total').textContent = results.total_rows;
+        document.getElementById('stat-valid').textContent = results.validation_summary.valid_rows;
+        document.getElementById('stat-invalid').textContent = results.validation_summary.invalid_rows;
+        document.getElementById('stat-warnings').textContent = results.validation_summary.warnings;
+        
+        // Show validation summary cards
+        const summaryHtml = `
+            <div class="validation-card valid">
+                <h4 class="text-success">${results.validation_summary.valid_rows}</h4>
+                <p class="mb-0">Valid Rows</p>
+            </div>
+            <div class="validation-card invalid">
+                <h4 class="text-danger">${results.validation_summary.invalid_rows}</h4>
+                <p class="mb-0">Invalid Rows</p>
+            </div>
+            <div class="validation-card warning">
+                <h4 class="text-warning">${results.validation_summary.warnings}</h4>
+                <p class="mb-0">Warnings</p>
+            </div>
+        `;
+        
+        document.getElementById('validation-summary').innerHTML = summaryHtml;
+        
+        // Show preview table
+        showPreviewTable(results.headers, results.preview_rows);
+        
+        // Show errors if any
+        if (results.errors && results.errors.length > 0) {
+            showValidationErrors(results.errors);
+        }
+    }
+    
+    function showPreviewTable(headers, rows) {
+        const headersHtml = '<tr>' + headers.map(header => `<th>${header || 'Unnamed'}</th>`).join('') + '</tr>';
+        const rowsHtml = rows.map(row => 
+            '<tr>' + row.map(cell => `<td>${cell || ''}</td>`).join('') + '</tr>'
+        ).join('');
+        
+        document.getElementById('preview-headers').innerHTML = headersHtml;
+        document.getElementById('preview-body').innerHTML = rowsHtml;
+    }
+    
+    function showValidationErrors(errors) {
+        const errorsHtml = `
+            <div class="alert alert-danger">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>Validation Errors</h5>
+                <ul class="mb-0">
+                    ${errors.map(error => `<li>${error}</li>`).join('')}
+                </ul>
+                ${errors.length >= 10 ? '<p class="mt-2 text-muted">Showing first 10 errors. Fix these and re-upload.</p>' : ''}
+            </div>
+        `;
+        
+        document.getElementById('validation-errors').innerHTML = errorsHtml;
+    }
+    
+    function proceedToConfiguration() {
+        if (validationResults.validation_summary.invalid_rows > 0 && !confirm('There are invalid rows in your data. Do you want to proceed anyway? Invalid rows will be skipped.')) {
+            return;
+        }
+        
+        updateStepIndicator(3);
+        document.getElementById('validation-section').style.display = 'none';
+        document.getElementById('configuration-section').style.display = 'block';
+    }
+    
+    function backToValidation() {
+        updateStepIndicator(2);
+        document.getElementById('configuration-section').style.display = 'none';
+        document.getElementById('validation-section').style.display = 'block';
+    }
+    
+    async function executeImport() {
+        if (!currentFileId) {
+            showNotification('No file to import', 'error');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to execute this import? This action cannot be undone.')) {
+            return;
+        }
+        
+        const options = {
+            update_existing: document.getElementById('update-existing').checked,
+            create_categories: document.getElementById('create-categories').checked,
+            skip_invalid: document.getElementById('skip-invalid').checked,
+            generate_slugs: document.getElementById('generate-slugs').checked
+        };
+        
+        try {
+            showProgressModal('Executing product import...');
+            
+            const response = await fetch('/admin-api/product-import/execute/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    file_id: currentFileId,
+                    options: options
+                })
+            });
+            
+            const result = await response.json();
+            
+            hideProgressModal();
+            
+            if (result.success) {
+                showImportResults(result.results);
+                updateStepIndicator(4);
+                
+                document.getElementById('configuration-section').style.display = 'none';
+                document.getElementById('results-section').style.display = 'block';
+                
+                showNotification('Import completed successfully!', 'success');
+            } else {
+                showNotification('Import failed: ' + result.error, 'error');
+            }
+            
+        } catch (error) {
+            hideProgressModal();
+            showNotification('Import failed: ' + error.message, 'error');
+        }
+    }
+    
+    function showImportResults(results) {
+        const resultsHtml = `
+            <div class="result-card created">
+                <h4 class="text-success">${results.created}</h4>
+                <p class="mb-0">Products Created</p>
+            </div>
+            <div class="result-card updated">
+                <h4 class="text-warning">${results.updated}</h4>
+                <p class="mb-0">Products Updated</p>
+            </div>
+            <div class="result-card skipped">
+                <h4 class="text-muted">${results.skipped}</h4>
+                <p class="mb-0">Products Skipped</p>
+            </div>
+            <div class="result-card errors">
+                <h4 class="text-danger">${results.errors.length}</h4>
+                <p class="mb-0">Errors</p>
+            </div>
+        `;
+        
+        document.getElementById('import-results').innerHTML = resultsHtml;
+        
+        if (results.errors.length > 0) {
+            const errorsHtml = `
+                <div class="alert alert-warning mt-3">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>Import Errors</h5>
+                    <ul class="mb-0">
+                        ${results.errors.slice(0, 10).map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                    ${results.errors.length > 10 ? `<p class="mt-2">... and ${results.errors.length - 10} more errors</p>` : ''}
+                </div>
+            `;
+            
+            document.getElementById('import-results').innerHTML += errorsHtml;
+        }
+    }
+    
+    function updateStepIndicator(step) {
+        importStep = step;
+        
+        for (let i = 1; i <= 4; i++) {
+            const stepElement = document.getElementById(`step-${i}`);
+            stepElement.classList.remove('active', 'completed');
+            
+            if (i < step) {
+                stepElement.classList.add('completed');
+            } else if (i === step) {
+                stepElement.classList.add('active');
+            }
+        }
+    }
+    
+    function resetImport() {
+        // Reset all variables and UI
+        currentFile = null;
+        currentFileId = null;
+        validationResults = null;
+        
+        // Show upload section, hide others
+        document.getElementById('upload-section').style.display = 'block';
+        document.getElementById('validation-section').style.display = 'none';
+        document.getElementById('configuration-section').style.display = 'none';
+        document.getElementById('results-section').style.display = 'none';
+        
+        // Reset file input
+        clearFile();
+        
+        // Reset stats
+        document.getElementById('stat-total').textContent = '0';
+        document.getElementById('stat-valid').textContent = '0';
+        document.getElementById('stat-invalid').textContent = '0';
+        document.getElementById('stat-warnings').textContent = '0';
+        
+        updateStepIndicator(1);
+    }
+    
+    function startNewImport() {
+        resetImport();
+    }
+    
+    function showProgressModal(message) {
+        document.getElementById('import-progress-message').textContent = message;
+        const modal = new bootstrap.Modal(document.getElementById('importProgressModal'));
+        modal.show();
+    }
+    
+    function hideProgressModal() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('importProgressModal'));
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; width: 350px;';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+    
+    console.log('📥 Product Import Interface Loaded Successfully!');
+</script>
+{% endblock %}

@@ -1,0 +1,907 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="{% block meta_description %}CartMax - Modern shopping experience with the latest products and best deals{% endblock %}">
+    <title>{% block title %}CartMax - Modern Shopping Experience{% endblock %}</title>
+    {% csrf_token %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Professional Typography - DM Sans for UI, Outfit for headings -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons - Reliable and tested -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Modern Design System CSS -->
+    <!-- Minimal CSS fixes for overflow (works with Bootstrap) -->
+    <link href="{% static 'css/fixes.css' %}" rel="stylesheet">
+    
+    <!-- Typography Standardization - fixes font consistency -->
+    <link href="{% static 'css/typography.css' %}" rel="stylesheet">
+    
+    <!-- Toast Notification System CSS -->
+    <link href="{% static 'css/toast_notifications.css' %}?v=3" rel="stylesheet">
+    <link href="{% static 'js/toast_notifications.js' %}?v=3" rel="as=script">
+    
+    <!-- Brand Styling CSS -->
+    <link href="{% static 'css/brand_styles.css' %}" rel="stylesheet">
+    
+    <!-- Poppins Font for Branding -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Modern Design System Variables */
+        :root {
+            /* Modern Color Palette - Light & Fresh */
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-200: #bfdbfe;
+            --primary-300: #93c5fd;
+            --primary-400: #60a5fa;
+            --primary-500: #3b82f6;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-800: #1e40af;
+            --primary-900: #1e3a8a;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #06b6d4;
+            
+            /* Modern Typography */
+            --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            
+            /* Modern Spacing Scale */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Modern Borders & Radius */
+            --border-radius-sm: 0.375rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 0.75rem;
+            --border-radius-xl: 1rem;
+            --border-radius-2xl: 1.5rem;
+            
+            /* Modern Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        
+        /* Modern Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            color: var(--gray-800);
+            background-color: var(--gray-50);
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: auto;
+            position: relative;
+            z-index: 0;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            overflow: visible !important;
+        }
+        
+        html {
+            height: 100%;
+        }
+        
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Modern Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--gray-900);
+        }
+        
+        h1 { font-size: 2.25rem; }
+        h2 { font-size: 1.875rem; }
+        h3 { font-size: 1.5rem; }
+        h4 { font-size: 1.25rem; }
+        h5 { font-size: 1.125rem; }
+        h6 { font-size: 1rem; }
+        
+        /* Remove underlines from all links globally */
+        a {
+            text-decoration: none !important;
+        }
+        
+        a:hover,
+        a:active,
+        a:focus,
+        a:visited {
+            text-decoration: none !important;
+        }
+        
+        /* Modern Button System */
+        .btn {
+            font-weight: 500;
+            border-radius: var(--border-radius-md);
+            border: 1px solid transparent;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            transition: all 0.15s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none !important;
+            cursor: pointer;
+        }
+        
+        .btn:active,
+        .btn:focus,
+        .btn:visited {
+            text-decoration: none !important;
+        }
+        
+        .btn-primary {
+            background: var(--primary-600);
+            color: white;
+            border-color: var(--primary-600);
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-700);
+            border-color: var(--primary-700);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-outline {
+            background: white;
+            color: var(--primary-600);
+            border-color: var(--primary-300);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-50);
+            color: var(--primary-700);
+            border-color: var(--primary-400);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-600);
+            border: none;
+        }
+        
+        .btn-ghost:hover {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+        
+        /* Modern Card System */
+        .card-modern {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        
+        .card-modern:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        /* Modern Form Controls */
+        .form-control-modern {
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius-md);
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            background: white;
+            transition: all 0.15s ease;
+        }
+        
+        .form-control-modern:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+        }
+        
+        /* Modern Navigation */
+        .navbar-modern {
+            background: white;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0.875rem 0;
+            overflow: visible !important;
+            position: relative;
+            z-index: 9999 !important;
+        }
+        
+        .navbar-modern .navbar-collapse {
+            overflow: visible !important;
+        }
+        
+        .navbar-modern .container {
+            position: relative;
+            z-index: 1000 !important;
+            overflow: visible !important;
+        }
+        
+        .navbar-modern .dropdown {
+            position: relative !important;
+            z-index: 1001 !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand-modern {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-600);
+            text-decoration: none !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            padding: 0.25rem 0;
+        }
+        
+        .navbar-brand-modern:hover,
+        .navbar-brand-modern:active,
+        .navbar-brand-modern:focus,
+        .navbar-brand-modern:visited {
+            text-decoration: none !important;
+        }
+        
+        /* Improved navbar action buttons */
+        .navbar-modern .btn-ghost {
+            padding: 0.375rem !important;
+            width: 2.25rem;
+            height: 2.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-md);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .navbar-modern .btn-ghost:hover {
+            background-color: var(--gray-100);
+        }
+        
+        /* Font Awesome icon styling for navbar */
+        .navbar-modern .btn-ghost i {
+            color: #374151 !important;
+            font-size: 1.25rem !important;
+        }
+        
+        .navbar-modern .btn-ghost:hover i {
+            color: #1f2937 !important;
+        }
+        
+        /* Better gap between navbar items */
+        .navbar-modern .gap-2 {
+            gap: 0.25rem !important;
+        }
+        
+        /* Fix dropdown menus to not be constrained */
+        .navbar-modern .dropdown-menu {
+            z-index: 999999 !important;
+            border: 1px solid var(--gray-200) !important;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25) !important;
+            position: fixed !important;
+            min-width: 220px !important;
+            background: white !important;
+            border-radius: var(--border-radius-lg) !important;
+            padding: 0.5rem 0 !important;
+            margin: 0 !important;
+            animation: slideDown 0.2s ease-out;
+            display: none !important;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .navbar-modern .dropdown-menu.show {
+            display: block !important;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .navbar-modern .dropdown-item {
+            padding: 0.75rem 1.25rem !important;
+            font-size: 0.95rem !important;
+            color: var(--gray-700) !important;
+        }
+        
+        .navbar-modern .dropdown-item:hover {
+            background-color: var(--primary-50) !important;
+            color: var(--primary-600) !important;
+        }
+        
+        /* Badge positioning fix - only show when count > 0 */
+        .navbar-modern .badge {
+            padding: 0.25rem 0.5rem !important;
+            font-size: 0.65rem !important;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .navbar-modern .position-relative .badge {
+            top: -6px !important;
+            right: -8px !important;
+        }
+        
+        /* Modern Search Bar */
+        .search-modern {
+            position: relative;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .search-modern input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius-lg);
+            background: var(--gray-50);
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+        }
+        
+        .search-modern input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            background: white;
+            box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+        }
+        
+        /* Search icon styling handled inline now */
+        
+        /* Modern Product Cards */
+        .product-card-modern {
+            background: white;
+            border-radius: var(--border-radius-xl);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .product-card-modern:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--primary-200);
+        }
+        
+        .product-image-modern {
+            aspect-ratio: 1;
+            overflow: hidden;
+            background: var(--gray-100);
+            position: relative;
+        }
+        
+        .product-image-modern img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card-modern:hover .product-image-modern img {
+            transform: scale(1.05);
+        }
+        
+        /* Modern Toast Notifications */
+        .toast-container-modern {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .toast-modern {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary-500);
+            padding: 1rem;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .toast-modern.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .toast-modern.success { border-left-color: var(--success); }
+        .toast-modern.error { border-left-color: var(--error); }
+        .toast-modern.warning { border-left-color: var(--warning); }
+        .toast-modern.info { border-left-color: var(--info); }
+        
+        /* Modern Footer */
+        .footer-modern {
+            background: var(--gray-900);
+            color: var(--gray-300);
+            padding: 1.5rem 0 1rem;
+            margin-top: auto;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        
+        .footer-modern h6 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            margin-bottom: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.2rem;
+        }
+        
+        .footer-links a {
+            color: var(--gray-300);
+            text-decoration: none;
+            transition: color 0.15s ease;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+        
+        .footer-links a:hover,
+        .hover-primary:hover {
+            color: var(--primary-400);
+        }
+        
+        .footer-modern p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .footer-modern .row {
+            align-items: flex-start;
+        }
+        
+        /* Footer responsive adjustments */
+        @media (max-width: 768px) {
+            .footer-modern {
+                padding: 0.75rem 0 0.5rem;
+            }
+            
+            .footer-modern .col-6 {
+                margin-bottom: 0.75rem;
+            }
+        }
+        
+        /* Modern Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            h1 { font-size: 1.875rem; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.25rem; }
+            
+            .search-modern {
+                max-width: 100%;
+            }
+        }
+        
+        /* Modern Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--gray-200) 25%, var(--gray-100) 50%, var(--gray-200) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Modern Utilities */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-600), var(--info));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Modern Logo Styling */
+        .cartmax-logo {
+            width: auto;
+            height: 3.5rem;
+            max-width: 280px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo-link:hover .cartmax-logo {
+            transform: scale(1.05) translateY(-2px);
+        }
+        
+        .cartmax-logo-footer {
+            width: 140px;
+            height: auto;
+            transition: all 0.2s ease;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+        }
+        
+        /* Responsive Logo Sizing */
+        @media (max-width: 768px) {
+            .cartmax-logo {
+                height: 3rem;
+            }
+            
+            .cartmax-logo-footer {
+                width: 120px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cartmax-logo {
+                height: 2.5rem;
+            }
+            
+            .cartmax-logo-footer {
+                width: 100px;
+            }
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <!-- Modern Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-modern sticky-top" style="overflow: visible !important;">
+        <div class="container" style="position: relative; z-index: 1000;">
+            <a class="navbar-brand-modern logo-link" href="{% url 'store:homepage' %}" aria-label="CartMax Home">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #2563eb, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.15); flex-shrink: 0;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <span style="font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #2563eb, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; display: block;">CartMax</span>
+                </div>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars" style="color: #374151; font-size: 1.25rem;"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Modern Search - Now on left side -->
+                <div class="search-modern d-none d-lg-block ms-4">
+                    <i class="fas fa-search" style="color: #9ca3af; position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); z-index: 5;"></i>
+                    <input type="text" placeholder="Search products..." aria-label="Search" style="padding-left: 2.5rem;">
+                </div>
+                
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <!-- Categories Link -->
+                    <a href="{% url 'store:category_list' %}" class="btn btn-ghost" title="View Categories">
+                        <i class="fas fa-th" style="color: #374151; font-size: 1.25rem;"></i>
+                    </a>
+                    
+                    
+                    <!-- User Actions -->
+                    <a href="{% url 'store:wishlist' %}" class="btn btn-ghost position-relative" title="Wishlist">
+                        <i class="fas fa-heart" style="color: #374151; font-size: 1.25rem;"></i>
+                        <span class="badge bg-danger rounded-pill position-absolute wishlist-counter" style="display: none;"></span>
+                    </a>
+                    <a href="{% url 'store:comparison' %}" class="btn btn-ghost position-relative" title="Compare">
+                        <i class="fas fa-chart-bar" style="color: #374151; font-size: 1.25rem;"></i>
+                        <span class="badge bg-info rounded-pill position-absolute compare-counter" style="display: none;"></span>
+                    </a>
+                    <a href="{% url 'store:cart_detail' %}" class="btn btn-ghost position-relative" title="Shopping Cart">
+                        <i class="fas fa-shopping-cart" style="color: #374151; font-size: 1.25rem;"></i>
+                        <span class="badge bg-primary rounded-pill position-absolute cart-counter" style="display: none;"></span>
+                    </a>
+                    
+                    {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <a href="#" class="btn btn-ghost p-2" data-bs-toggle="dropdown" title="User Account">
+                            <i class="fas fa-user" style="color: #374151; font-size: 1.25rem;"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'store:profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'store:order_history' %}">Orders</a></li>
+                            {% if user.is_staff %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'admin_dashboard:admin_control_dashboard' %}">
+                                <i class="fas fa-sliders-h" style="margin-right: 0.5rem;"></i> Admin Control Panel
+                            </a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'store:logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'store:login' %}" class="btn btn-outline btn-sm">Sign In</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Modern Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="row g-2">
+                <!-- Brand Section -->
+                <div class="col-lg-3 col-md-12 mb-2">
+                    <a href="{% url 'store:homepage' %}" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; margin-bottom: 1rem;">
+                        <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #2563eb, #06b6d4); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 8px rgba(0,0,0,0.15); flex-shrink: 0;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                        </div>
+                        <span style="font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: #ffffff;">CartMax</span>
+                    </a>
+                    <p class="text-light mb-0">Your modern shopping destination with the latest products and unbeatable deals.</p>
+                </div>
+                
+                <!-- Shop Section -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="text-white fw-bold mb-2 fs-6">Shop</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'store:category_list' %}">Categories</a></li>
+                        <li><a href="{% url 'store:search_products' %}">New Arrivals</a></li>
+                        <li><a href="{% url 'store:search_products' %}">Best Sellers</a></li>
+                        <li><a href="{% url 'store:search_products' %}">Deals</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Account Section -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="text-white fw-bold mb-2 fs-6">Account</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'store:profile' %}">My Profile</a></li>
+                        <li><a href="{% url 'store:order_history' %}">Order History</a></li>
+                        <li><a href="{% url 'store:wishlist' %}">Wishlist</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Support Section -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="text-white fw-bold mb-2 fs-6">Support</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'store:help_center' %}">Help Center</a></li>
+                        <li><a href="{% url 'store:contact' %}">Contact Us</a></li>
+                        <li><a href="{% url 'store:shipping_info' %}">Shipping</a></li>
+                        <li><a href="{% url 'store:returns' %}">Returns</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Legal Section -->
+                <div class="col-lg-3 col-md-3 col-6">
+                    <h6 class="text-white fw-bold mb-2 fs-6">Legal</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{% url 'store:privacy_policy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'store:terms_of_service' %}">Terms of Service</a></li>
+                        <li><a href="{% url 'store:cookies_policy' %}">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="my-3 border-secondary opacity-25">
+            
+            <div class="row align-items-center py-2">
+                <div class="col-md-6">
+                    <p class="text-light mb-0 fs-6">&copy; 2025 CartMax. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-2 mt-md-0" style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <div class="d-flex gap-3" style="justify-content: flex-end;">
+                        <a href="https://facebook.com" class="text-light hover-primary" target="_blank" rel="noopener">
+                            <i class="fab fa-facebook" style="color: white; font-size: 1.25rem;"></i>
+                        </a>
+                        <a href="https://twitter.com" class="text-light hover-primary" target="_blank" rel="noopener">
+                            <i class="fab fa-twitter" style="color: white; font-size: 1.25rem;"></i>
+                        </a>
+                        <a href="https://instagram.com" class="text-light hover-primary" target="_blank" rel="noopener">
+                            <i class="fab fa-instagram" style="color: white; font-size: 1.25rem;"></i>
+                        </a>
+                        <a href="https://linkedin.com" class="text-light hover-primary" target="_blank" rel="noopener">
+                            <i class="fab fa-linkedin" style="color: white; font-size: 1.25rem;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery (required by cart.js) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- CSRF Token Setup for Django AJAX requests -->
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        window.csrftoken = getCookie('csrftoken');
+        console.log('🔐 CSRF Token Available:', window.csrftoken ? '✅ YES' : '❌ NO');
+        
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    xhr.setRequestHeader('X-CSRFToken', window.csrftoken);
+                }
+            }
+        });
+        
+        function updateBadgeCount(selector, count) {
+            const badge = document.querySelector(selector);
+            if (badge) {
+                if (count && count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartCount = localStorage.getItem('cart_count') || 0;
+            updateBadgeCount('.cart-counter', cartCount);
+        });
+        
+        window.updateCartCount = function(count) {
+            localStorage.setItem('cart_count', count);
+            updateBadgeCount('.cart-counter', count);
+        };
+    </script>
+    
+    <!-- Toast Container for toast_notifications.js -->
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999; pointer-events: none;"></div>
+    
+    <!-- Unified Toast Notification System (from toast_notifications.js) -->
+    <script src="{% static 'js/toast_notifications.js' %}"></script>
+    
+    <!-- CartMax Cart Functionality -->
+    <script src="{% static 'js/cart.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Dropdown positioning -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdowns = document.querySelectorAll('.navbar-modern .dropdown');
+            dropdowns.forEach(dropdown => {
+                const toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                
+                if (toggle && menu) {
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        setTimeout(() => {
+                            if (menu.classList.contains('show')) {
+                                const toggleRect = toggle.getBoundingClientRect();
+                                menu.style.top = (toggleRect.bottom + 8) + 'px';
+                                menu.style.right = (window.innerWidth - toggleRect.right) + 'px';
+                                menu.style.left = 'auto';
+                            }
+                        }, 50);
+                    });
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

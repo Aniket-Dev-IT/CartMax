@@ -1,0 +1,462 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}{{ product.name }} - Product Details{% endblock %}
+
+{% block page_title %}Product Details{% endblock %}
+
+{% block extra_css %}
+<style>
+.product-detail-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.product-detail-card h5 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--dark-text);
+    min-width: 150px;
+    margin-right: 15px;
+}
+
+.detail-value {
+    color: var(--light-text);
+    flex: 1;
+}
+
+.price-display {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.price-inr {
+    color: #ff6b35;
+}
+
+.price-usd {
+    color: #007cba;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.product-image {
+    max-width: 300px;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.specifications-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.specifications-table th,
+.specifications-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.specifications-table th {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.recent-orders {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.order-item {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main Product Details -->
+    <div class="col-lg-8">
+        <!-- Basic Information -->
+        <div class="product-detail-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                <div class="action-buttons">
+                    <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Edit Product
+                    </a>
+                    <a href="{% url 'admin_dashboard:product_list' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to List
+                    </a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Product Name:</div>
+                        <div class="detail-value"><strong>{{ product.name }}</strong></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Brand:</div>
+                        <div class="detail-value">{{ product.brand|default:"Not specified" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">SKU:</div>
+                        <div class="detail-value"><code>{{ product.sku }}</code></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Category:</div>
+                        <div class="detail-value">{{ product.category.name }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Status:</div>
+                        <div class="detail-value">
+                            {% if product.available %}
+                                <span class="status-badge status-active">Active</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">Inactive</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Featured:</div>
+                        <div class="detail-value">
+                            {% if product.featured %}
+                                <i class="fas fa-star text-warning"></i> Yes
+                            {% else %}
+                                <i class="far fa-star text-muted"></i> No
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" class="product-image">
+                    {% else %}
+                        <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Information -->
+        <div class="product-detail-card">
+            <h5><i class="fas fa-coins me-2"></i>Dual Currency Pricing</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">INR Price:</div>
+                        <div class="detail-value price-display price-inr">₹{{ product.price_inr|default:"0.00" }}</div>
+                    </div>
+                    {% if product.original_price_inr %}
+                    <div class="detail-row">
+                        <div class="detail-label">Original INR Price:</div>
+                        <div class="detail-value">₹{{ product.original_price_inr }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">INR Discount:</div>
+                        <div class="detail-value">
+                            <span class="badge bg-success">{{ product.get_discount_percentage }}% OFF</span>
+                            <small class="text-muted">(Save ₹{{ product.get_savings_amount }})</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">USD Price:</div>
+                        <div class="detail-value price-display price-usd">${{ product.price_usd|default:"0.00" }}</div>
+                    </div>
+                    {% if product.original_price_usd %}
+                    <div class="detail-row">
+                        <div class="detail-label">Original USD Price:</div>
+                        <div class="detail-value">${{ product.original_price_usd }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">USD Discount:</div>
+                        <div class="detail-value">
+                            <span class="badge bg-success">{{ product.get_discount_percentage:'USD' }}% OFF</span>
+                            <small class="text-muted">(Save ${{ product.get_savings_amount:'USD' }})</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory & Details -->
+        <div class="product-detail-card">
+            <h5><i class="fas fa-boxes me-2"></i>Inventory & Details</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Stock Quantity:</div>
+                        <div class="detail-value">
+                            <strong>{{ product.stock }}</strong>
+                            {% if product.stock <= 10 %}
+                                <span class="badge bg-warning ms-2">Low Stock</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Min Order Qty:</div>
+                        <div class="detail-value">{{ product.min_order_quantity|default:"1" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Weight:</div>
+                        <div class="detail-value">{{ product.weight|default:"Not specified" }} kg</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Dimensions:</div>
+                        <div class="detail-value">{{ product.dimensions|default:"Not specified" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-row">
+                        <div class="detail-label">Color:</div>
+                        <div class="detail-value">{{ product.color|default:"Not specified" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Size:</div>
+                        <div class="detail-value">{{ product.size|default:"Not specified" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Material:</div>
+                        <div class="detail-value">{{ product.material|default:"Not specified" }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Warranty:</div>
+                        <div class="detail-value">{{ product.warranty_period|default:"Not specified" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="product-detail-card">
+            <h5><i class="fas fa-align-left me-2"></i>Description</h5>
+            <div class="detail-row">
+                <div class="detail-label">Full Description:</div>
+                <div class="detail-value">{{ product.description|linebreaks }}</div>
+            </div>
+            {% if product.short_description %}
+            <div class="detail-row">
+                <div class="detail-label">Short Description:</div>
+                <div class="detail-value">{{ product.short_description }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- SEO Information -->
+        {% if product.meta_title or product.meta_description or product.search_keywords %}
+        <div class="product-detail-card">
+            <h5><i class="fas fa-search me-2"></i>SEO Information</h5>
+            {% if product.meta_title %}
+            <div class="detail-row">
+                <div class="detail-label">Meta Title:</div>
+                <div class="detail-value">{{ product.meta_title }}</div>
+            </div>
+            {% endif %}
+            {% if product.meta_description %}
+            <div class="detail-row">
+                <div class="detail-label">Meta Description:</div>
+                <div class="detail-value">{{ product.meta_description }}</div>
+            </div>
+            {% endif %}
+            {% if product.search_keywords %}
+            <div class="detail-row">
+                <div class="detail-label">Search Keywords:</div>
+                <div class="detail-value">{{ product.search_keywords }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Product Specifications -->
+        {% if specifications %}
+        <div class="product-detail-card">
+            <h5><i class="fas fa-list me-2"></i>Specifications</h5>
+            <table class="specifications-table">
+                <thead>
+                    <tr>
+                        <th>Specification</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spec in specifications %}
+                    <tr>
+                        <td>{{ spec.name }}</td>
+                        <td>{{ spec.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Stats -->
+        <div class="dashboard-card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar text-primary me-2"></i>
+                    Quick Stats
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="detail-row">
+                    <div class="detail-label">Average Rating:</div>
+                    <div class="detail-value">
+                        {% if product.get_average_rating %}
+                            {{ product.get_average_rating }}/5 
+                            <small class="text-muted">({{ product.get_review_count }} reviews)</small>
+                        {% else %}
+                            No reviews yet
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Created:</div>
+                    <div class="detail-value">{{ product.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Last Updated:</div>
+                    <div class="detail-value">{{ product.updated_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Product URL:</div>
+                    <div class="detail-value">
+                        <a href="{{ product.get_absolute_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-external-link-alt me-1"></i>View on Site
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        {% if recent_orders %}
+        <div class="dashboard-card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-shopping-cart text-success me-2"></i>
+                    Recent Orders
+                </h3>
+            </div>
+            <div class="card-body p-0">
+                <div class="recent-orders">
+                    {% for order_item in recent_orders %}
+                    <div class="order-item">
+                        <div>
+                            <strong>Order #{{ order_item.order.order_id }}</strong><br>
+                            <small class="text-muted">{{ order_item.order.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div>Qty: {{ order_item.quantity }}</div>
+                            <small class="text-success">₹{{ order_item.price }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Additional Images -->
+        {% if images %}
+        <div class="dashboard-card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-images text-info me-2"></i>
+                    Product Images
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for image in images %}
+                    <div class="col-6 mb-3">
+                        <img src="{{ image.image.url }}" alt="{{ image.alt_text }}" 
+                             class="img-fluid rounded" style="height: 100px; object-fit: cover; width: 100%;">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Reviews -->
+        {% if reviews %}
+        <div class="dashboard-card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Recent Reviews
+                </h3>
+            </div>
+            <div class="card-body">
+                {% for review in reviews %}
+                <div class="mb-3 pb-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>{{ review.user.username }}</strong>
+                        <span class="badge bg-warning">{{ review.rating }}/5</span>
+                    </div>
+                    <p class="mb-1">{{ review.title }}</p>
+                    <p class="text-muted small">{{ review.comment|truncatewords:15 }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

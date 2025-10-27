@@ -1,0 +1,101 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-user-edit text-primary me-2"></i>
+                    User Information
+                </h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_username" class="form-label fw-bold">Username</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_email" class="form-label fw-bold">Email</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label fw-bold">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label fw-bold">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label for="id_is_active" class="form-check-label fw-bold">
+                                    Active User
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                {{ form.is_staff }}
+                                <label for="id_is_staff" class="form-check-label fw-bold">
+                                    Staff Member
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-professional">
+                                <i class="fas fa-save me-2"></i>{{ submit_text }}
+                            </button>
+                            <a href="{% url 'admin_dashboard:user_list' %}" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-info-circle text-primary me-2"></i>
+                    Help
+                </h3>
+            </div>
+            <div class="card-body">
+                <h6>User Permissions</h6>
+                <ul class="mb-3">
+                    <li><strong>Active:</strong> User can login and use the system</li>
+                    <li><strong>Staff:</strong> User has access to admin areas</li>
+                </ul>
+                
+                <h6>Important Notes</h6>
+                <ul>
+                    <li>Username cannot be changed after creation</li>
+                    <li>Email must be unique</li>
+                    <li>Deactivating staff users will restrict admin access</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

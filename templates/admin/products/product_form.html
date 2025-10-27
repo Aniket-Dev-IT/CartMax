@@ -1,0 +1,529 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.form-section h5 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 8px;
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--light-text);
+    margin-top: 4px;
+}
+
+.required-field {
+    color: var(--danger-color);
+}
+
+.product-preview {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.form-check {
+    margin-top: 10px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h5><i class="fas fa-info-circle me-2"></i>Basic Information</h5>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="id_name" class="form-label">Product Name <span class="required-field">*</span></label>
+                        {{ form.name }}
+                        <div class="help-text">Enter a clear, descriptive product name</div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="id_sku" class="form-label">SKU</label>
+                        {{ form.sku }}
+                        <div class="help-text">Unique product identifier</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_category" class="form-label">Category <span class="required-field">*</span></label>
+                        {{ form.category }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_brand" class="form-label">Brand</label>
+                        {{ form.brand }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                    <div class="help-text">Detailed product description for customers</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_short_description" class="form-label">Short Description</label>
+                    {{ form.short_description }}
+                    <div class="help-text">Brief summary for product listings</div>
+                </div>
+            </div>
+            
+            <!-- Manual Dual Currency Pricing -->
+            <div class="form-section">
+                <h5><i class="fas fa-coins me-2"></i>Manual Dual Currency Pricing</h5>
+                {% if help_text %}
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle me-2"></i>{{ help_text }}
+                </div>
+                {% endif %}
+                
+                <!-- Indian Rupee Pricing -->
+                <div class="row mb-4">
+                    <div class="col-12 mb-2">
+                        <h6 class="text-warning"><i class="fas fa-rupee-sign me-1"></i> Indian Rupee (INR) Pricing</h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_price_inr" class="form-label">INR Sale Price <span class="required-field">*</span></label>
+                        {{ form.price_inr }}
+                        <div class="help-text">Current selling price in Indian Rupees (₹)</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_original_price_inr" class="form-label">INR Original Price</label>
+                        {{ form.original_price_inr }}
+                        <div class="help-text">Original INR price (for discount calculation)</div>
+                    </div>
+                </div>
+                
+                <!-- US Dollar Pricing -->
+                <div class="row mb-4">
+                    <div class="col-12 mb-2">
+                        <h6 class="text-primary"><i class="fas fa-dollar-sign me-1"></i> US Dollar (USD) Pricing</h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_price_usd" class="form-label">USD Sale Price <span class="required-field">*</span></label>
+                        {{ form.price_usd }}
+                        <div class="help-text">Current selling price in US Dollars ($)</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_original_price_usd" class="form-label">USD Original Price</label>
+                        {{ form.original_price_usd }}
+                        <div class="help-text">Original USD price (for discount calculation)</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Discount Tools -->
+                <div class="row border-top pt-3">
+                    <div class="col-12 mb-2">
+                        <h6 class="text-success"><i class="fas fa-percent me-1"></i> Quick Discount Calculator (Optional)</h6>
+                        <p class="small text-muted">Apply percentage discounts quickly. Original prices will be set automatically.</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_inr_discount_percent" class="form-label">INR Discount %</label>
+                        {{ form.inr_discount_percent }}
+                        <div class="help-text">Apply discount to INR pricing</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_usd_discount_percent" class="form-label">USD Discount %</label>
+                        {{ form.usd_discount_percent }}
+                        <div class="help-text">Apply discount to USD pricing</div>
+                    </div>
+                </div>
+                
+                <!-- Stock Management -->
+                <div class="row border-top pt-3">
+                    <div class="col-12 mb-2">
+                        <h6 class="text-info"><i class="fas fa-boxes me-1"></i> Inventory Management</h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_stock" class="form-label">Stock Quantity <span class="required-field">*</span></label>
+                        {{ form.stock }}
+                        <div class="help-text">Current available inventory</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_low_stock_alert" class="form-label">Low Stock Alert</label>
+                        {{ form.low_stock_alert }}
+                        <div class="help-text">Alert when stock falls below this number</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_min_order_quantity" class="form-label">Minimum Order Quantity</label>
+                        {{ form.min_order_quantity }}
+                        <div class="help-text">Minimum quantity that must be ordered</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Details -->
+            <div class="form-section">
+                <h5><i class="fas fa-cogs me-2"></i>Product Details</h5>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="id_weight" class="form-label">Weight (kg)</label>
+                        {{ form.weight }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_dimensions" class="form-label">Dimensions</label>
+                        {{ form.dimensions }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_color" class="form-label">Color</label>
+                        {{ form.color }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="id_size" class="form-label">Size</label>
+                        {{ form.size }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_material" class="form-label">Material</label>
+                        {{ form.material }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_warranty_period" class="form-label">Warranty Period</label>
+                        {{ form.warranty_period }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Image & SEO -->
+            <div class="form-section">
+                <h5><i class="fas fa-image me-2"></i>Images & SEO</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_main_image" class="form-label">Main Product Image</label>
+                        {{ form.main_image }}
+                        <div class="help-text">Primary product image shown in listings</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_search_keywords" class="form-label">Search Keywords</label>
+                        {{ form.search_keywords }}
+                        <div class="help-text">Comma-separated keywords for search</div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_meta_title" class="form-label">SEO Title</label>
+                        {{ form.meta_title }}
+                        <div class="help-text">SEO page title (60 chars max)</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_meta_description" class="form-label">SEO Description</label>
+                        {{ form.meta_description }}
+                        <div class="help-text">SEO meta description (160 chars max)</div>
+                    </div>
+                </div>
+                
+                <div class="row border-top pt-3">
+                    <div class="col-12 mb-2">
+                        <h6 class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Advanced: URL Management</h6>
+                        <p class="small text-muted">Only change these if you understand the consequences of breaking existing links.</p>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label for="id_slug" class="form-label">Product URL Slug</label>
+                        {{ form.slug }}
+                        <div class="help-text text-danger">{{ form.slug.help_text }}</div>
+                    </div>
+                    <div class="col-md-4 mb-3 d-flex align-items-end">
+                        <div class="form-check">
+                            {{ form.update_slug }}
+                            <label class="form-check-label fw-bold text-warning" for="id_update_slug">
+                                {{ form.update_slug.label }}
+                            </label>
+                            <div class="help-text text-danger small">{{ form.update_slug.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings -->
+            <div class="form-section">
+                <h5><i class="fas fa-cog me-2"></i>Product Settings</h5>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            {{ form.available }}
+                            <label class="form-check-label fw-bold" for="id_available">
+                                Available for Sale
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            {{ form.featured }}
+                            <label class="form-check-label fw-bold" for="id_featured">
+                                Featured Product
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            {{ form.is_digital }}
+                            <label class="form-check-label fw-bold" for="id_is_digital">
+                                Digital Product
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-check">
+                            {{ form.is_returnable }}
+                            <label class="form-check-label fw-bold" for="id_is_returnable">
+                                Returnable
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="form-section">
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'admin_dashboard:product_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-professional">
+                        <i class="fas fa-save me-2"></i>{{ submit_text }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-lightbulb text-primary me-2"></i>
+                    Product Tips
+                </h3>
+            </div>
+            <div class="card-body">
+                <h6>Product Name</h6>
+                <ul class="mb-3">
+                    <li>Use clear, descriptive titles</li>
+                    <li>Include key features and brand</li>
+                    <li>Avoid excessive capitalization</li>
+                </ul>
+                
+                <h6>Manual Dual Currency Pricing</h6>
+                <ul class="mb-3">
+                    <li>Set both INR (₹) and USD ($) prices manually</li>
+                    <li>No automatic conversion - you control both prices</li>
+                    <li>Consider regional market differences</li>
+                    <li>Use original prices to show discounts</li>
+                    <li>Quick discount tools available for each currency</li>
+                </ul>
+                
+                <h6>SEO Optimization</h6>
+                <ul class="mb-3">
+                    <li>Use relevant keywords in title</li>
+                    <li>Write compelling descriptions</li>
+                    <li>Add search keywords for findability</li>
+                </ul>
+                
+                <h6>Images</h6>
+                <ul>
+                    <li>Use high-quality product photos</li>
+                    <li>Recommended size: 800x800px</li>
+                    <li>Show product from multiple angles</li>
+                </ul>
+            </div>
+        </div>
+        
+        {% if product %}
+        <div class="dashboard-card mt-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-eye text-primary me-2"></i>
+                    Product Preview
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="product-preview">
+                    {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="max-width: 100%; height: 150px; object-fit: cover; border-radius: 8px;">
+                    {% else %}
+                        <div class="bg-light p-4 rounded">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                            <p class="text-muted mt-2">No image uploaded</p>
+                        </div>
+                    {% endif %}
+                    
+                    <h6 class="mt-3">{{ product.name }}</h6>
+                    
+                    <!-- Dual Currency Display -->
+                    {% if product.price_inr and product.price_usd %}
+                        <div class="d-flex justify-content-center gap-3 mb-2">
+                            <div class="text-center">
+                                <div class="text-warning fw-bold">₹{{ product.price_inr }}</div>
+                                {% if product.original_price_inr and product.original_price_inr != product.price_inr %}
+                                    <small class="text-muted text-decoration-line-through">₹{{ product.original_price_inr }}</small>
+                                    <br><small class="badge bg-success">{{ product.get_discount_percentage }}% OFF</small>
+                                {% endif %}
+                                <div class="small text-muted">INR Price</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-primary fw-bold">${{ product.price_usd }}</div>
+                                {% if product.original_price_usd and product.original_price_usd != product.price_usd %}
+                                    <small class="text-muted text-decoration-line-through">${{ product.original_price_usd }}</small>
+                                    <br><small class="badge bg-success">{{ product.get_discount_percentage }}% OFF</small>
+                                {% endif %}
+                                <div class="small text-muted">USD Price</div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Legacy single currency display -->
+                        <div class="text-primary fw-bold">₹{{ product.price|default:'0' }}</div>
+                        {% if product.original_price and product.original_price != product.price %}
+                            <small class="text-muted text-decoration-line-through">₹{{ product.original_price }}</small>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-generate SKU from product name if empty
+document.getElementById('id_name')?.addEventListener('input', function() {
+    const skuField = document.getElementById('id_sku');
+    if (!skuField.value) {
+        const sku = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 10);
+        if (sku) {
+            skuField.value = 'PRD-' + sku;
+        }
+    }
+});
+
+// Character count for SEO fields
+function addCharacterCount(fieldId, maxLength) {
+    const field = document.getElementById(fieldId);
+    if (field) {
+        const counter = document.createElement('div');
+        counter.className = 'help-text';
+        counter.style.textAlign = 'right';
+        
+        function updateCount() {
+            const current = field.value.length;
+            counter.innerHTML = `${current}/${maxLength} characters`;
+            counter.style.color = current > maxLength ? '#ef4444' : '#64748b';
+        }
+        
+        field.addEventListener('input', updateCount);
+        field.parentNode.appendChild(counter);
+        updateCount();
+    }
+}
+
+addCharacterCount('id_meta_title', 60);
+addCharacterCount('id_meta_description', 160);
+
+// Slug editing functionality
+function toggleSlugEditing() {
+    const slugField = document.getElementById('id_slug');
+    const updateSlugCheckbox = document.getElementById('id_update_slug');
+    
+    if (updateSlugCheckbox.checked) {
+        slugField.removeAttribute('readonly');
+        slugField.style.backgroundColor = '#fff3cd';
+        slugField.style.borderColor = '#ffc107';
+        
+        // Show warning
+        if (!document.getElementById('slug-warning')) {
+            const warning = document.createElement('div');
+            warning.id = 'slug-warning';
+            warning.className = 'alert alert-warning mt-2';
+            warning.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i><strong>Warning:</strong> Changing the slug will break existing bookmarks and search engine links. The old URL will redirect automatically, but it\'s still not recommended unless necessary.';
+            slugField.parentNode.appendChild(warning);
+        }
+    } else {
+        slugField.setAttribute('readonly', true);
+        slugField.style.backgroundColor = '#e9ecef';
+        slugField.style.borderColor = '#ced4da';
+        
+        // Remove warning
+        const warning = document.getElementById('slug-warning');
+        if (warning) {
+            warning.remove();
+        }
+    }
+}
+
+// Auto-generate slug from product name (for new products only)
+document.getElementById('id_name')?.addEventListener('input', function() {
+    const slugField = document.getElementById('id_slug');
+    const updateSlugCheckbox = document.getElementById('id_update_slug');
+    
+    // Only auto-generate if slug is empty (new product) or if updating is enabled
+    if (!slugField.value || updateSlugCheckbox.checked) {
+        const slug = this.value
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+            .trim()
+            .replace(/\s+/g, '-')        // Replace spaces with hyphens
+            .replace(/-+/g, '-')         // Replace multiple hyphens with single
+            .substring(0, 50);           // Limit length
+        
+        if (updateSlugCheckbox.checked) {
+            slugField.value = slug;
+        }
+    }
+});
+</script>
+{% endblock %}

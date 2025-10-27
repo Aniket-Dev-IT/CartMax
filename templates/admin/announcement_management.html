@@ -1,0 +1,564 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}📢 Announcement Management - Site-wide Broadcasting{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="epic-card">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-bullhorn text-warning fa-2x me-3"></i>
+                    <div>
+                        <h1 class="mb-1">📢 Site-wide Announcement System</h1>
+                        <p class="text-muted mb-0">Broadcast important messages to your users with precision targeting</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="total-announcements" class="text-primary">0</h3>
+                <p class="mb-0">Total Announcements</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="active-announcements" class="text-success">0</h3>
+                <p class="mb-0">Currently Active</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="scheduled-announcements" class="text-warning">0</h3>
+                <p class="mb-0">Scheduled</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="total-views" class="text-info">0</h3>
+                <p class="mb-0">Total Views</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Panel - Announcements List -->
+        <div class="col-md-8">
+            <!-- Create New Announcement -->
+            <div class="epic-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-plus text-success"></i> Create New Announcement</h3>
+                    <button class="epic-button" onclick="showCreateModal()">
+                        <i class="fas fa-plus"></i> New Announcement
+                    </button>
+                </div>
+                <p class="text-muted">Create targeted announcements to inform your users about updates, promotions, maintenance, and important notices.</p>
+            </div>
+
+            <!-- Filters and Search -->
+            <div class="epic-card mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Filter by Type</label>
+                        <select class="form-select" id="type-filter">
+                            <option value="all">All Types</option>
+                            <option value="info">Information</option>
+                            <option value="warning">Warning</option>
+                            <option value="success">Success</option>
+                            <option value="danger">Critical Alert</option>
+                            <option value="promotion">Promotion</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Filter by Status</label>
+                        <select class="form-select" id="status-filter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="scheduled">Scheduled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Search Announcements</label>
+                        <input type="text" class="form-control" id="search-input" placeholder="Search by title or message...">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="loadAnnouncements()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Announcements List -->
+            <div class="epic-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-list text-info"></i> Announcements</h3>
+                    <div>
+                        <button class="btn btn-sm btn-outline-success" onclick="loadAnnouncements()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div id="announcements-container">
+                    <!-- Announcements will be loaded here -->
+                    <div class="loading-placeholder text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted">Loading announcements...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="mt-4" id="announcements-pagination" style="display: none;">
+                    <ul class="pagination justify-content-center">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Right Panel - Tools & Analytics -->
+        <div class="col-md-4">
+            <!-- Quick Templates -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-file-alt text-primary"></i> Quick Templates</h3>
+                <div class="template-grid">
+                    <div class="template-card" onclick="useTemplate('maintenance')">
+                        <i class="fas fa-tools text-secondary"></i>
+                        <span>Maintenance Notice</span>
+                    </div>
+                    <div class="template-card" onclick="useTemplate('promotion')">
+                        <i class="fas fa-star text-warning"></i>
+                        <span>Promotion Alert</span>
+                    </div>
+                    <div class="template-card" onclick="useTemplate('update')">
+                        <i class="fas fa-info-circle text-info"></i>
+                        <span>System Update</span>
+                    </div>
+                    <div class="template-card" onclick="useTemplate('critical')">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                        <span>Critical Alert</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Summary -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-chart-bar text-success"></i> Analytics Overview</h3>
+                <div id="analytics-summary">
+                    <div class="analytics-item">
+                        <span>Most Viewed Type:</span>
+                        <span id="most-viewed-type" class="text-warning">--</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span>Average Views:</span>
+                        <span id="average-views" class="text-info">--</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span>Click-through Rate:</span>
+                        <span id="click-through-rate" class="text-success">--</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span>This Month:</span>
+                        <span id="monthly-count" class="text-primary">-- created</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="epic-card">
+                <h3><i class="fas fa-history text-secondary"></i> Recent Activity</h3>
+                <div id="recent-activity">
+                    <div class="activity-item">
+                        <i class="fas fa-info-circle text-info me-2"></i>
+                        <span>System ready for announcements</span>
+                        <small class="d-block text-muted">Initialized</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Announcement Modal -->
+<div class="modal fade" id="announcementModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">📢 Create Site-wide Announcement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="announcement-form">
+                    <div class="row">
+                        <!-- Basic Information -->
+                        <div class="col-md-12 mb-3">
+                            <label for="announcement-title" class="form-label">Announcement Title*</label>
+                            <input type="text" class="form-control" id="announcement-title" required>
+                            <div class="form-text">Make it clear and attention-grabbing</div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label for="announcement-message" class="form-label">Message*</label>
+                            <textarea class="form-control" id="announcement-message" rows="4" required></textarea>
+                            <div class="form-text">The main content of your announcement</div>
+                        </div>
+
+                        <!-- Type and Priority -->
+                        <div class="col-md-6 mb-3">
+                            <label for="announcement-type" class="form-label">Type*</label>
+                            <select class="form-select" id="announcement-type" required>
+                                <option value="">Select Type</option>
+                                <option value="info">📘 Information</option>
+                                <option value="warning">⚠️ Warning</option>
+                                <option value="success">✅ Success</option>
+                                <option value="danger">🚨 Critical Alert</option>
+                                <option value="promotion">⭐ Promotion</option>
+                                <option value="maintenance">🔧 Maintenance</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="announcement-priority" class="form-label">Priority</label>
+                            <select class="form-select" id="announcement-priority">
+                                <option value="low">Low Priority</option>
+                                <option value="medium" selected>Medium Priority</option>
+                                <option value="high">High Priority</option>
+                                <option value="urgent">🔥 Urgent</option>
+                            </select>
+                        </div>
+
+                        <!-- Targeting -->
+                        <div class="col-md-6 mb-3">
+                            <label for="announcement-audience" class="form-label">Target Audience</label>
+                            <select class="form-select" id="announcement-audience">
+                                <option value="all" selected>All Users</option>
+                                <option value="registered">Registered Users Only</option>
+                                <option value="guests">Guest Users Only</option>
+                                <option value="staff">Staff Only</option>
+                                <option value="premium">Premium Users</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="announcement-start" class="form-label">Start Date/Time*</label>
+                            <input type="datetime-local" class="form-control" id="announcement-start" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="announcement-end" class="form-label">End Date/Time</label>
+                            <input type="datetime-local" class="form-control" id="announcement-end">
+                            <div class="form-text">Leave empty for no end date</div>
+                        </div>
+
+                        <!-- Display Options -->
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Display Options</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show-homepage" checked>
+                                        <label class="form-check-label" for="show-homepage">
+                                            Show on Homepage
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show-header">
+                                        <label class="form-check-label" for="show-header">
+                                            Show in Header
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="show-popup">
+                                        <label class="form-check-label" for="show-popup">
+                                            Show as Popup
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is-dismissible" checked>
+                                <label class="form-check-label" for="is-dismissible">
+                                    Allow users to dismiss this announcement
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="col-md-6 mb-3">
+                            <label for="action-button-text" class="form-label">Action Button Text</label>
+                            <input type="text" class="form-control" id="action-button-text" placeholder="Learn More">
+                            <div class="form-text">Optional call-to-action button</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="action-button-url" class="form-label">Action Button URL</label>
+                            <input type="url" class="form-control" id="action-button-url" placeholder="https://...">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAnnouncement()">
+                    <i class="fas fa-save"></i> Create Announcement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">👀 Announcement Preview</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="preview-content">
+                    <!-- Preview will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .template-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .template-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #3c4043;
+        border-radius: 8px;
+        background: #2d2d30;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .template-card:hover {
+        border-color: #ffd700;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2);
+    }
+    
+    .template-card i {
+        font-size: 1.5em;
+        margin-bottom: 8px;
+    }
+    
+    .template-card span {
+        font-size: 0.9em;
+        font-weight: 500;
+    }
+    
+    .analytics-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #3c4043;
+    }
+    
+    .analytics-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #3c4043;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    
+    .announcement-card {
+        border: 1px solid #3c4043;
+        border-radius: 8px;
+        background: #202124;
+        margin-bottom: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .announcement-card:hover {
+        border-color: #ffd700;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.1);
+    }
+    
+    .announcement-header {
+        padding: 15px;
+        border-bottom: 1px solid #3c4043;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+    
+    .announcement-body {
+        padding: 15px;
+    }
+    
+    .announcement-footer {
+        padding: 10px 15px;
+        background: #2d2d30;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9em;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    
+    .status-badge.active {
+        background: rgba(46, 213, 115, 0.2);
+        color: #2ed573;
+        border: 1px solid #2ed573;
+    }
+    
+    .status-badge.inactive {
+        background: rgba(154, 160, 166, 0.2);
+        color: #9aa0a6;
+        border: 1px solid #9aa0a6;
+    }
+    
+    .status-badge.scheduled {
+        background: rgba(255, 215, 0, 0.2);
+        color: #ffd700;
+        border: 1px solid #ffd700;
+    }
+    
+    .priority-badge {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.7em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .priority-badge.urgent {
+        background: #ff4757;
+        color: white;
+    }
+    
+    .priority-badge.high {
+        background: #ffa502;
+        color: white;
+    }
+    
+    .priority-badge.medium {
+        background: #3742fa;
+        color: white;
+    }
+    
+    .priority-badge.low {
+        background: #747d8c;
+        color: white;
+    }
+    
+    .loading-placeholder {
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<script>
+    let currentPage = 1;
+    let announcementsData = [];
+    let editingAnnouncementId = null;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeAnnouncementManagement();
+    });
+    
+    function initializeAnnouncementManagement() {
+        setupEventListeners();
+        loadAnnouncements();
+        loadAnalytics();
+        
+        // Set default start date to now
+        const now = new Date();
+        const localDateTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+        document.getElementById('announcement-start').value = localDateTime;
+        
+        console.log('📢 Announcement Management System initialized');
+    }
+    
+    function setupEventListeners() {
+        // Filter change events
+        document.getElementById('type-filter').addEventListener('change', () => {
+            currentPage = 1;
+            loadAnnouncements();
+        });
+        
+        document.getElementById('status-filter').addEventListener('change', () => {
+            currentPage = 1;
+            loadAnnouncements();
+        });
+        
+        // Search with debounce
+        let searchTimeout;
+        document.getElementById('search-input').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadAnnouncements();
+            }, 500);
+        });
+    }
+    
+    async function loadAnnouncements() {
+        const container = document.getElementById('announcements-container');
+        
+        try {
+            const typeFilter = document.getElementById('type-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const searchQuery = document.getElementById('search-input').value;
+            
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 10,
+                type: typeFilter,
+                status: statusFilter,
+                search: searchQuery
+            });
+            
+            const response = await fetch(`/admin-api/announcements/?${params}`);\n            const data = await response.json();\n            \n            announcementsData = data;\n            renderAnnouncements(data);\n            renderPagination(data.pagination);\n            \n        } catch (error) {\n            container.innerHTML = `\n                <div class=\"loading-placeholder text-center py-5\">\n                    <i class=\"fas fa-exclamation-triangle fa-3x text-danger mb-3\"></i>\n                    <p class=\"text-danger\">Failed to load announcements</p>\n                </div>\n            `;\n        }\n    }\n    \n    function renderAnnouncements(data) {\n        const container = document.getElementById('announcements-container');\n        \n        if (!data.announcements || data.announcements.length === 0) {\n            container.innerHTML = `\n                <div class=\"loading-placeholder text-center py-5\">\n                    <i class=\"fas fa-bullhorn fa-3x text-muted mb-3\"></i>\n                    <p class=\"text-muted\">No announcements found</p>\n                    <button class=\"epic-button\" onclick=\"showCreateModal()\">\n                        <i class=\"fas fa-plus\"></i> Create First Announcement\n                    </button>\n                </div>\n            `;\n            return;\n        }\n        \n        let announcementsHtml = '';\n        \n        data.announcements.forEach(announcement => {\n            const statusClass = announcement.is_currently_active ? 'active' : announcement.is_active ? 'scheduled' : 'inactive';\n            const statusText = announcement.is_currently_active ? 'Active' : announcement.is_active ? 'Scheduled' : 'Inactive';\n            \n            announcementsHtml += `\n                <div class=\"announcement-card\">\n                    <div class=\"announcement-header\">\n                        <div class=\"d-flex align-items-center flex-grow-1\">\n                            <i class=\"${announcement.icon} me-3 text-2x\"></i>\n                            <div>\n                                <h5 class=\"mb-1\">${announcement.title}</h5>\n                                <div class=\"d-flex align-items-center gap-2\">\n                                    <span class=\"status-badge ${statusClass}\">${statusText}</span>\n                                    <span class=\"priority-badge ${announcement.priority}\">${announcement.priority}</span>\n                                    <small class=\"text-muted\">${announcement.target_display}</small>\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"announcement-actions\">\n                            <button class=\"btn btn-sm btn-outline-info\" onclick=\"previewAnnouncement('${announcement.id}')\" title=\"Preview\">\n                                <i class=\"fas fa-eye\"></i>\n                            </button>\n                            <button class=\"btn btn-sm btn-outline-warning\" onclick=\"editAnnouncement('${announcement.id}')\" title=\"Edit\">\n                                <i class=\"fas fa-edit\"></i>\n                            </button>\n                            <button class=\"btn btn-sm btn-outline-danger\" onclick=\"deleteAnnouncement('${announcement.id}')\" title=\"Delete\">\n                                <i class=\"fas fa-trash\"></i>\n                            </button>\n                        </div>\n                    </div>\n                    \n                    <div class=\"announcement-body\">\n                        <p class=\"mb-2\">${announcement.message}</p>\n                        \n                        <div class=\"row mt-3\">\n                            <div class=\"col-md-6\">\n                                <small class=\"text-muted\">\n                                    <i class=\"fas fa-calendar me-1\"></i>\n                                    Start: ${new Date(announcement.start_date).toLocaleString()}\n                                </small>\n                                ${announcement.end_date ? `<br><small class=\"text-muted\"><i class=\"fas fa-calendar-times me-1\"></i>End: ${new Date(announcement.end_date).toLocaleString()}</small>` : ''}\n                            </div>\n                            <div class=\"col-md-6 text-end\">\n                                <div class=\"display-options\">\n                                    ${announcement.show_on_homepage ? '<span class=\"badge bg-info me-1\">Homepage</span>' : ''}\n                                    ${announcement.show_in_header ? '<span class=\"badge bg-warning me-1\">Header</span>' : ''}\n                                    ${announcement.show_as_popup ? '<span class=\"badge bg-primary me-1\">Popup</span>' : ''}\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    \n                    <div class=\"announcement-footer\">\n                        <div>\n                            <small class=\"text-muted\">Created by ${announcement.created_by} on ${announcement.created_at}</small>\n                        </div>\n                        <div>\n                            <small class=\"text-info me-3\">\n                                <i class=\"fas fa-eye me-1\"></i>${announcement.views_count} views\n                            </small>\n                            ${announcement.clicks_count > 0 ? `<small class=\"text-success\"><i class=\"fas fa-mouse-pointer me-1\"></i>${announcement.clicks_count} clicks</small>` : ''}\n                        </div>\n                    </div>\n                </div>\n            `;\n        });\n        \n        container.innerHTML = announcementsHtml;\n    }\n    \n    function renderPagination(pagination) {\n        const paginationNav = document.getElementById('announcements-pagination');\n        const paginationUl = paginationNav.querySelector('.pagination');\n        \n        if (pagination.total_pages <= 1) {\n            paginationNav.style.display = 'none';\n            return;\n        }\n        \n        paginationNav.style.display = 'block';\n        \n        let paginationHtml = '';\n        \n        if (pagination.has_previous) {\n            paginationHtml += `<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick=\"changePage(${pagination.page - 1})\">Previous</a></li>`;\n        }\n        \n        for (let i = Math.max(1, pagination.page - 2); i <= Math.min(pagination.total_pages, pagination.page + 2); i++) {\n            const active = i === pagination.page ? 'active' : '';\n            paginationHtml += `<li class=\"page-item ${active}\"><a class=\"page-link\" href=\"#\" onclick=\"changePage(${i})\">${i}</a></li>`;\n        }\n        \n        if (pagination.has_next) {\n            paginationHtml += `<li class=\"page-item\"><a class=\"page-link\" href=\"#\" onclick=\"changePage(${pagination.page + 1})\">Next</a></li>`;\n        }\n        \n        paginationUl.innerHTML = paginationHtml;\n    }\n    \n    function changePage(page) {\n        currentPage = page;\n        loadAnnouncements();\n    }\n    \n    async function loadAnalytics() {\n        try {\n            // For demo purposes, we'll use placeholder analytics\n            const analytics = {\n                total_announcements: 12,\n                active_announcements: 3,\n                scheduled_announcements: 2,\n                total_views: 1247,\n                most_viewed_type: 'Promotion',\n                average_views: 104,\n                click_through_rate: '12.3%',\n                monthly_count: 5\n            };\n            \n            document.getElementById('total-announcements').textContent = analytics.total_announcements;\n            document.getElementById('active-announcements').textContent = analytics.active_announcements;\n            document.getElementById('scheduled-announcements').textContent = analytics.scheduled_announcements;\n            document.getElementById('total-views').textContent = analytics.total_views;\n            document.getElementById('most-viewed-type').textContent = analytics.most_viewed_type;\n            document.getElementById('average-views').textContent = analytics.average_views;\n            document.getElementById('click-through-rate').textContent = analytics.click_through_rate;\n            document.getElementById('monthly-count').textContent = analytics.monthly_count;\n            \n        } catch (error) {\n            console.error('Failed to load analytics:', error);\n        }\n    }\n    \n    function showCreateModal() {\n        editingAnnouncementId = null;\n        document.getElementById('announcement-form').reset();\n        document.querySelector('#announcementModal .modal-title').textContent = '📢 Create Site-wide Announcement';\n        \n        // Set default start time to now\n        const now = new Date();\n        const localDateTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);\n        document.getElementById('announcement-start').value = localDateTime;\n        \n        const modal = new bootstrap.Modal(document.getElementById('announcementModal'));\n        modal.show();\n    }\n    \n    async function saveAnnouncement() {\n        const form = document.getElementById('announcement-form');\n        if (!form.checkValidity()) {\n            form.reportValidity();\n            return;\n        }\n        \n        const formData = {\n            title: document.getElementById('announcement-title').value,\n            message: document.getElementById('announcement-message').value,\n            announcement_type: document.getElementById('announcement-type').value,\n            priority: document.getElementById('announcement-priority').value,\n            target_audience: document.getElementById('announcement-audience').value,\n            start_date: document.getElementById('announcement-start').value,\n            end_date: document.getElementById('announcement-end').value || null,\n            is_active: true,\n            is_dismissible: document.getElementById('is-dismissible').checked,\n            show_on_homepage: document.getElementById('show-homepage').checked,\n            show_in_header: document.getElementById('show-header').checked,\n            show_as_popup: document.getElementById('show-popup').checked,\n            action_button_text: document.getElementById('action-button-text').value || null,\n            action_button_url: document.getElementById('action-button-url').value || null\n        };\n        \n        try {\n            const response = await fetch('/admin-api/announcements/create/', {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json',\n                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value\n                },\n                body: JSON.stringify(formData)\n            });\n            \n            const result = await response.json();\n            \n            if (result.success) {\n                showNotification('Announcement created successfully!', 'success');\n                bootstrap.Modal.getInstance(document.getElementById('announcementModal')).hide();\n                loadAnnouncements();\n                loadAnalytics();\n                addToActivityLog('Created announcement: ' + formData.title, 'success');\n            } else {\n                showNotification('Failed to create announcement: ' + result.error, 'error');\n            }\n            \n        } catch (error) {\n            showNotification('Failed to create announcement: ' + error.message, 'error');\n        }\n    }\n    \n    function useTemplate(templateType) {\n        const templates = {\n            maintenance: {\n                title: 'Scheduled Maintenance Notice',\n                message: 'We will be performing scheduled maintenance on our systems. During this time, you may experience brief service interruptions. We apologize for any inconvenience.',\n                type: 'maintenance',\n                priority: 'high'\n            },\n            promotion: {\n                title: 'Special Offer - Limited Time!',\n                message: 'Don\\'t miss out on our exclusive promotion! Get amazing deals on your favorite products. Offer valid while supplies last.',\n                type: 'promotion',\n                priority: 'medium'\n            },\n            update: {\n                title: 'System Update Available',\n                message: 'We\\'ve released new features and improvements to enhance your experience. Update now to access the latest functionality.',\n                type: 'info',\n                priority: 'medium'\n            },\n            critical: {\n                title: 'Important Security Notice',\n                message: 'We have identified and resolved a security issue. Please review your account settings and update your password if necessary.',\n                type: 'danger',\n                priority: 'urgent'\n            }\n        };\n        \n        const template = templates[templateType];\n        if (template) {\n            document.getElementById('announcement-title').value = template.title;\n            document.getElementById('announcement-message').value = template.message;\n            document.getElementById('announcement-type').value = template.type;\n            document.getElementById('announcement-priority').value = template.priority;\n            \n            showCreateModal();\n        }\n    }\n    \n    function previewAnnouncement(announcementId) {\n        // Find the announcement data\n        const announcement = announcementsData.announcements.find(a => a.id == announcementId);\n        if (!announcement) return;\n        \n        const previewHtml = `\n            <div class=\"alert ${announcement.css_class} d-flex align-items-center\" role=\"alert\">\n                <i class=\"${announcement.icon} me-3 fa-2x\"></i>\n                <div class=\"flex-grow-1\">\n                    <h5 class=\"alert-heading\">${announcement.title}</h5>\n                    <p class=\"mb-0\">${announcement.full_message}</p>\n                    ${announcement.action_button_text ? `<hr><button class=\"btn btn-outline-dark\">${announcement.action_button_text}</button>` : ''}\n                </div>\n                ${announcement.is_dismissible ? '<button type=\"button\" class=\"btn-close\" aria-label=\"Close\"></button>' : ''}\n            </div>\n            \n            <div class=\"mt-4\">\n                <h6>Announcement Details:</h6>\n                <ul class=\"list-unstyled\">\n                    <li><strong>Type:</strong> ${announcement.type_display}</li>\n                    <li><strong>Priority:</strong> ${announcement.priority}</li>\n                    <li><strong>Target:</strong> ${announcement.target_display}</li>\n                    <li><strong>Start:</strong> ${new Date(announcement.start_date).toLocaleString()}</li>\n                    ${announcement.end_date ? `<li><strong>End:</strong> ${new Date(announcement.end_date).toLocaleString()}</li>` : ''}\n                    <li><strong>Display:</strong> \n                        ${announcement.show_on_homepage ? 'Homepage ' : ''}\n                        ${announcement.show_in_header ? 'Header ' : ''}\n                        ${announcement.show_as_popup ? 'Popup' : ''}\n                    </li>\n                </ul>\n            </div>\n        `;\n        \n        document.getElementById('preview-content').innerHTML = previewHtml;\n        \n        const modal = new bootstrap.Modal(document.getElementById('previewModal'));\n        modal.show();\n    }\n    \n    function editAnnouncement(announcementId) {\n        showNotification('Edit functionality - Coming in Phase 2B!', 'info');\n    }\n    \n    function deleteAnnouncement(announcementId) {\n        if (confirm('Are you sure you want to delete this announcement? This action cannot be undone.')) {\n            showNotification('Delete functionality - Coming in Phase 2B!', 'info');\n        }\n    }\n    \n    function addToActivityLog(message, type) {\n        const logContainer = document.getElementById('recent-activity');\n        const timestamp = new Date().toLocaleTimeString();\n        \n        const iconMap = {\n            'success': 'fas fa-check-circle text-success',\n            'error': 'fas fa-exclamation-circle text-danger',\n            'info': 'fas fa-info-circle text-info'\n        };\n        \n        const activityItem = document.createElement('div');\n        activityItem.className = 'activity-item';\n        activityItem.innerHTML = `\n            <i class=\"${iconMap[type]} me-2\"></i>\n            <span>${message}</span>\n            <small class=\"d-block text-muted\">${timestamp}</small>\n        `;\n        \n        logContainer.prepend(activityItem);\n        \n        // Keep only last 5 items\n        const items = logContainer.querySelectorAll('.activity-item');\n        if (items.length > 5) {\n            items[items.length - 1].remove();\n        }\n    }\n    \n    function showNotification(message, type) {\n        const notification = document.createElement('div');\n        notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed`;\n        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; width: 350px;';\n        notification.textContent = message;\n        \n        document.body.appendChild(notification);\n        \n        setTimeout(() => {\n            notification.remove();\n        }, 5000);\n    }\n    \n    console.log('📢 Site-wide Announcement Management System Loaded Successfully!');\n</script>\n{% endblock %}

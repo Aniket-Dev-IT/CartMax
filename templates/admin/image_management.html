@@ -1,0 +1,1050 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}🖼️ Image Management - Media Control Center{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="epic-card">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-images text-primary fa-2x me-3"></i>
+                    <div>
+                        <h1 class="mb-1">🖼️ Image Management System</h1>
+                        <p class="text-muted mb-0">Professional media control center with advanced processing capabilities</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="total-images" class="text-primary">0</h3>
+                <p class="mb-0">Total Images</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="selected-images" class="text-warning">0</h3>
+                <p class="mb-0">Selected</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="storage-used" class="text-info">0 MB</h3>
+                <p class="mb-0">Storage Used</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="epic-card text-center">
+                <h3 id="processed-today" class="text-success">0</h3>
+                <p class="mb-0">Processed Today</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="row">
+        <!-- Left Panel - Gallery & Controls -->
+        <div class="col-md-9">
+            <!-- Upload Section -->
+            <div class="epic-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-cloud-upload-alt text-success"></i> Upload Images</h3>
+                    <div class="upload-controls">
+                        <input type="file" id="image-upload" multiple accept="image/*" style="display: none;">
+                        <button class="epic-button" onclick="document.getElementById('image-upload').click()">
+                            <i class="fas fa-plus"></i> Choose Images
+                        </button>
+                        <button class="epic-button ms-2" onclick="pasteFromClipboard()">
+                            <i class="fas fa-paste"></i> Paste from Clipboard
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt fa-4x text-muted mb-3"></i>
+                        <h4>Drop images here or click to browse</h4>
+                        <p class="text-muted">Supports JPG, PNG, GIF, WebP • Max 10MB per image</p>
+                    </div>
+                </div>
+
+                <div id="upload-progress" class="upload-progress mt-3" style="display: none;">
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <p class="text-muted mb-0">Uploading and processing images...</p>
+                </div>
+            </div>
+
+            <!-- Filter & Search -->
+            <div class="epic-card mb-4">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Filter by Type</label>
+                        <select class="form-select" id="image-type-filter">
+                            <option value="all">All Types</option>
+                            <option value="product">Product Images</option>
+                            <option value="category">Category Images</option>
+                            <option value="banner">Banner Images</option>
+                            <option value="avatar">Avatar Images</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Search Images</label>
+                        <input type="text" class="form-control" id="image-search" placeholder="Search by filename...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">View Mode</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="view-mode" id="grid-view" value="grid" checked>
+                            <label class="btn btn-outline-primary" for="grid-view">
+                                <i class="fas fa-th"></i> Grid
+                            </label>
+                            <input type="radio" class="btn-check" name="view-mode" id="list-view" value="list">
+                            <label class="btn btn-outline-primary" for="list-view">
+                                <i class="fas fa-list"></i> List
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Gallery -->
+            <div class="epic-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-images text-info"></i> Image Gallery</h3>
+                    <div class="gallery-controls">
+                        <button class="btn btn-sm btn-outline-primary" onclick="selectAllImages()">
+                            <i class="fas fa-check-square"></i> Select All
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">
+                            <i class="fas fa-square"></i> Clear
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="refreshGallery()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gallery-container" class="gallery-grid">
+                    <!-- Images will be loaded here -->
+                    <div class="loading-placeholder text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted">Loading image gallery...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="mt-4" id="gallery-pagination" style="display: none;">
+                    <ul class="pagination justify-content-center">
+                        <!-- Pagination will be generated here -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Right Panel - Tools & Operations -->
+        <div class="col-md-3">
+            <!-- Quick Actions -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-bolt text-warning"></i> Quick Actions</h3>
+                <div class="d-grid gap-2">
+                    <button class="epic-button" onclick="openImageProcessor()" disabled id="process-btn">
+                        <i class="fas fa-magic"></i> Process Selected
+                    </button>
+                    <button class="epic-button" onclick="downloadSelected()" disabled id="download-btn">
+                        <i class="fas fa-download"></i> Download Selected
+                    </button>
+                    <button class="epic-button" onclick="deleteSelected()" disabled id="delete-btn">
+                        <i class="fas fa-trash"></i> Delete Selected
+                    </button>
+                </div>
+            </div>
+
+            <!-- Batch Processing -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-cogs text-success"></i> Batch Operations</h3>
+                <div id="batch-operations">
+                    <div class="operation-group mb-3">
+                        <label class="form-label small">Resize</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="batch-width" placeholder="Width">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" class="form-control form-control-sm" id="batch-height" placeholder="Height">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="operation-group mb-3">
+                        <label class="form-label small">Compress Quality</label>
+                        <input type="range" class="form-range" id="batch-quality" min="10" max="100" value="85">
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Low</span>
+                            <span id="quality-value">85%</span>
+                            <span>High</span>
+                        </div>
+                    </div>
+
+                    <div class="operation-group mb-3">
+                        <label class="form-label small">Apply Filter</label>
+                        <select class="form-select form-select-sm" id="batch-filter">
+                            <option value="none">No Filter</option>
+                            <option value="grayscale">Grayscale</option>
+                            <option value="blur">Blur</option>
+                            <option value="sharpen">Sharpen</option>
+                            <option value="sepia">Sepia</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-success w-100" onclick="applyBatchOperations()" disabled id="batch-apply-btn">
+                        <i class="fas fa-play"></i> Apply to Selected
+                    </button>
+                </div>
+            </div>
+
+            <!-- Image Information -->
+            <div class="epic-card mb-4">
+                <h3><i class="fas fa-info-circle text-info"></i> Image Details</h3>
+                <div id="image-details">
+                    <p class="text-muted">Select an image to view details</p>
+                </div>
+            </div>
+
+            <!-- Usage Statistics -->
+            <div class="epic-card">
+                <h3><i class="fas fa-chart-pie text-purple"></i> Usage Stats</h3>
+                <div id="usage-stats">
+                    <canvas id="usage-chart" width="200" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Processor Modal -->
+<div class="modal fade" id="imageProcessorModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">⚡ Advanced Image Processor</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="image-preview-area">
+                            <div id="image-preview" class="text-center">
+                                <p class="text-muted">Processing interface will be loaded here</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="processing-controls">
+                            <h6>Processing Options</h6>
+                            <!-- Processing controls will be here -->
+                            <div class="operation-panel">
+                                <div class="form-group mb-3">
+                                    <label>Resize</label>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" placeholder="Width">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" class="form-control" placeholder="Height">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label>Quality</label>
+                                    <input type="range" class="form-range" min="10" max="100" value="85">
+                                </div>
+                                <button class="btn btn-primary w-100">
+                                    <i class="fas fa-magic"></i> Apply Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title">⚡ Processing Images</h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <p id="progress-message">Processing your images...</p>
+                <div class="progress">
+                    <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" 
+                         role="progressbar" id="process-progress-bar" style="width: 0%"></div>
+                </div>
+                <p class="text-muted mt-2" id="progress-details">Please wait...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-area {
+        border: 2px dashed #3c4043;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-area:hover, .upload-area.dragover {
+        border-color: #ffd700;
+        background: rgba(255, 215, 0, 0.05);
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        min-height: 400px;
+    }
+    
+    .gallery-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .image-card {
+        border: 1px solid #3c4043;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #202124;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .image-card:hover {
+        border-color: #ffd700;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+    }
+    
+    .image-card.selected {
+        border-color: #ffd700;
+        box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
+    }
+    
+    .image-card .image-thumbnail {
+        width: 100%;
+        height: 150px;
+        background: #2d2d30;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .image-card .image-thumbnail img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+    }
+    
+    .image-card .image-info {
+        padding: 10px;
+    }
+    
+    .image-card .image-name {
+        font-size: 12px;
+        font-weight: bold;
+        color: #e8eaed;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .image-card .image-meta {
+        font-size: 10px;
+        color: #9aa0a6;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .image-card .selection-checkbox {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 2;
+    }
+    
+    .image-card .image-actions {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .image-card:hover .image-actions {
+        opacity: 1;
+    }
+    
+    .image-action-btn {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .operation-group {
+        background: #2d2d30;
+        padding: 12px;
+        border-radius: 6px;
+    }
+    
+    .loading-placeholder {
+        grid-column: 1 / -1;
+    }
+    
+    .image-list-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #3c4043;
+        border-radius: 6px;
+        background: #202124;
+    }
+    
+    .image-list-item .thumbnail {
+        width: 60px;
+        height: 60px;
+        background: #2d2d30;
+        border-radius: 4px;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    
+    .image-list-item .info {
+        flex-grow: 1;
+    }
+    
+    .image-list-item .actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .usage-chart-container {
+        height: 200px;
+    }
+</style>
+
+<script>
+    let selectedImages = new Set();
+    let currentGalleryData = [];
+    let currentPage = 1;
+    let totalImages = 0;
+    let viewMode = 'grid';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeImageManagement();
+    });
+    
+    function initializeImageManagement() {
+        setupImageUpload();
+        setupFilters();
+        setupBatchControls();
+        loadImageGallery();
+        
+        console.log('🖼️ Image Management System initialized');
+    }
+    
+    function setupImageUpload() {
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('image-upload');
+        
+        // File input change
+        fileInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                uploadImages(Array.from(e.target.files));
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files).filter(file => 
+                file.type.startsWith('image/')
+            );
+            
+            if (files.length > 0) {
+                uploadImages(files);
+            }
+        });
+        
+        uploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+    }
+    
+    function setupFilters() {
+        const typeFilter = document.getElementById('image-type-filter');
+        const searchInput = document.getElementById('image-search');
+        const viewModeRadios = document.querySelectorAll('input[name="view-mode"]');
+        
+        typeFilter.addEventListener('change', function() {
+            currentPage = 1;
+            loadImageGallery();
+        });
+        
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                loadImageGallery();
+            }, 500);
+        });
+        
+        viewModeRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                viewMode = this.value;
+                renderGallery(currentGalleryData);
+            });
+        });
+    }
+    
+    function setupBatchControls() {
+        const qualitySlider = document.getElementById('batch-quality');
+        const qualityValue = document.getElementById('quality-value');
+        
+        qualitySlider.addEventListener('input', function() {
+            qualityValue.textContent = this.value + '%';
+        });
+    }
+    
+    async function uploadImages(files) {
+        const formData = new FormData();
+        files.forEach(file => formData.append('images', file));
+        
+        const progressDiv = document.getElementById('upload-progress');
+        const progressBar = progressDiv.querySelector('.progress-bar');
+        
+        try {
+            progressDiv.style.display = 'block';
+            progressBar.style.width = '0%';
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                progressBar.style.width = progress + '%';
+                if (progress >= 90) clearInterval(progressInterval);
+            }, 200);
+            
+            const response = await fetch('/admin-api/image/upload/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 1000);
+            
+            if (result.success) {
+                showNotification(`Successfully uploaded ${result.total_uploaded} images`, 'success');
+                loadImageGallery(); // Refresh gallery
+                
+                // Update stats
+                document.getElementById('processed-today').textContent = 
+                    parseInt(document.getElementById('processed-today').textContent) + result.total_uploaded;
+            } else {
+                showNotification('Upload failed: ' + result.error, 'error');
+            }
+            
+        } catch (error) {
+            progressDiv.style.display = 'none';
+            showNotification('Upload failed: ' + error.message, 'error');
+        }
+    }
+    
+    async function loadImageGallery() {
+        const galleryContainer = document.getElementById('gallery-container');
+        
+        try {
+            const typeFilter = document.getElementById('image-type-filter').value;
+            const searchQuery = document.getElementById('image-search').value;
+            
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 20,
+                type: typeFilter,
+                search: searchQuery
+            });
+            
+            const response = await fetch(`/admin-api/image/gallery/?${params}`);
+            const data = await response.json();
+            
+            currentGalleryData = data;
+            renderGallery(data);
+            renderPagination(data.pagination);
+            
+            // Update stats
+            document.getElementById('total-images').textContent = data.pagination.total_images;
+            
+        } catch (error) {
+            galleryContainer.innerHTML = `
+                <div class="loading-placeholder text-center py-5">
+                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                    <p class="text-danger">Failed to load gallery</p>
+                </div>
+            `;
+        }
+    }
+    
+    function renderGallery(data) {
+        const galleryContainer = document.getElementById('gallery-container');
+        
+        if (!data.images || data.images.length === 0) {
+            galleryContainer.innerHTML = `
+                <div class="loading-placeholder text-center py-5">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No images found</p>
+                </div>
+            `;
+            return;
+        }
+        
+        galleryContainer.className = viewMode === 'grid' ? 'gallery-grid' : 'gallery-list';
+        
+        const imagesHtml = data.images.map(image => {
+            if (viewMode === 'grid') {
+                return createImageCard(image);
+            } else {
+                return createImageListItem(image);
+            }
+        }).join('');
+        
+        galleryContainer.innerHTML = imagesHtml;
+        
+        // Setup click handlers
+        setupImageInteractions();
+    }
+    
+    function createImageCard(image) {
+        const isSelected = selectedImages.has(image.id);
+        const typeColor = {
+            'product': 'text-warning',
+            'category': 'text-info',
+            'banner': 'text-success',
+            'avatar': 'text-primary'
+        }[image.type] || 'text-secondary';
+        
+        return `
+            <div class="image-card ${isSelected ? 'selected' : ''}" data-image-id="${image.id}">
+                <input type="checkbox" class="form-check-input selection-checkbox" 
+                       ${isSelected ? 'checked' : ''} onchange="toggleImageSelection('${image.id}', this)">
+                
+                <div class="image-actions">
+                    <button class="image-action-btn" onclick="previewImage('${image.id}')" title="Preview">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="image-action-btn" onclick="downloadImage('${image.id}')" title="Download">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="image-action-btn" onclick="deleteImage('${image.id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="image-thumbnail">
+                    <img src="https://via.placeholder.com/200x150/3c4043/9aa0a6?text=${image.name}" 
+                         alt="${image.name}" loading="lazy">
+                </div>
+                
+                <div class="image-info">
+                    <div class="image-name">${image.filename}</div>
+                    <div class="image-meta">
+                        <span class="${typeColor}">${image.type}</span>
+                        <span>${image.size.size_kb}KB</span>
+                    </div>
+                    <div class="image-meta">
+                        <span>${image.size.width}x${image.size.height}</span>
+                        <span>Used: ${image.usage_count}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function createImageListItem(image) {
+        const isSelected = selectedImages.has(image.id);
+        const typeColor = {
+            'product': 'text-warning',
+            'category': 'text-info', 
+            'banner': 'text-success',
+            'avatar': 'text-primary'
+        }[image.type] || 'text-secondary';
+        
+        return `
+            <div class="image-list-item ${isSelected ? 'selected' : ''}" data-image-id="${image.id}">
+                <input type="checkbox" class="form-check-input me-2" 
+                       ${isSelected ? 'checked' : ''} onchange="toggleImageSelection('${image.id}', this)">
+                
+                <div class="thumbnail">
+                    <img src="https://via.placeholder.com/60x60/3c4043/9aa0a6?text=${image.name.charAt(0)}" 
+                         alt="${image.name}" class="w-100 h-100" style="object-fit: cover;">
+                </div>
+                
+                <div class="info">
+                    <div class="fw-bold">${image.filename}</div>
+                    <div class="text-muted small">
+                        <span class="${typeColor}">${image.type}</span> • 
+                        ${image.size.width}x${image.size.height} • 
+                        ${image.size.size_kb}KB • 
+                        Used ${image.usage_count} times
+                    </div>
+                    <div class="text-muted small">${image.upload_date} by ${image.uploader}</div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-sm btn-outline-primary" onclick="previewImage('${image.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="downloadImage('${image.id}')">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteImage('${image.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function setupImageInteractions() {
+        // Setup click to select
+        document.querySelectorAll('.image-card, .image-list-item').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (e.target.type === 'checkbox' || e.target.closest('button')) return;
+                
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                toggleImageSelection(this.dataset.imageId, checkbox);
+            });
+        });
+    }
+    
+    function toggleImageSelection(imageId, checkbox) {
+        if (checkbox.checked) {
+            selectedImages.add(imageId);
+            checkbox.closest('.image-card, .image-list-item').classList.add('selected');
+        } else {
+            selectedImages.delete(imageId);
+            checkbox.closest('.image-card, .image-list-item').classList.remove('selected');
+        }
+        
+        updateSelectionStats();
+        updateActionButtons();
+    }
+    
+    function updateSelectionStats() {
+        document.getElementById('selected-images').textContent = selectedImages.size;
+    }
+    
+    function updateActionButtons() {
+        const hasSelection = selectedImages.size > 0;
+        
+        document.getElementById('process-btn').disabled = !hasSelection;
+        document.getElementById('download-btn').disabled = !hasSelection;
+        document.getElementById('delete-btn').disabled = !hasSelection;
+        document.getElementById('batch-apply-btn').disabled = !hasSelection;
+    }
+    
+    function selectAllImages() {
+        document.querySelectorAll('.selection-checkbox, .image-list-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = true;
+            const imageId = checkbox.closest('[data-image-id]').dataset.imageId;
+            selectedImages.add(imageId);
+            checkbox.closest('.image-card, .image-list-item').classList.add('selected');
+        });
+        
+        updateSelectionStats();
+        updateActionButtons();
+    }
+    
+    function clearSelection() {
+        selectedImages.clear();
+        
+        document.querySelectorAll('.selection-checkbox, .image-list-item input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+            checkbox.closest('.image-card, .image-list-item').classList.remove('selected');
+        });
+        
+        updateSelectionStats();
+        updateActionButtons();
+    }
+    
+    function refreshGallery() {
+        loadImageGallery();
+        showNotification('Gallery refreshed', 'info');
+    }
+    
+    async function applyBatchOperations() {
+        if (selectedImages.size === 0) {
+            showNotification('No images selected', 'warning');
+            return;
+        }
+        
+        const operations = {};
+        
+        const width = document.getElementById('batch-width').value;
+        const height = document.getElementById('batch-height').value;
+        if (width || height) {
+            operations.resize = {
+                width: parseInt(width) || 800,
+                height: parseInt(height) || 600
+            };
+        }
+        
+        const quality = document.getElementById('batch-quality').value;
+        if (quality != 85) {
+            operations.compress = { quality: parseInt(quality) };
+        }
+        
+        const filter = document.getElementById('batch-filter').value;
+        if (filter !== 'none') {
+            operations.filter = { type: filter };
+        }
+        
+        if (Object.keys(operations).length === 0) {
+            showNotification('No operations specified', 'warning');
+            return;
+        }
+        
+        try {
+            showProgressModal('Applying batch operations...');
+            
+            const response = await fetch('/admin-api/image/batch-process/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    image_ids: Array.from(selectedImages),
+                    operations: operations
+                })
+            });
+            
+            const result = await response.json();
+            
+            hideProgressModal();
+            
+            if (result.success) {
+                showNotification(`Successfully processed ${result.processed_count} images`, 'success');
+                clearSelection();
+                loadImageGallery();
+            } else {
+                showNotification('Batch processing failed: ' + result.error, 'error');
+            }
+            
+        } catch (error) {
+            hideProgressModal();
+            showNotification('Batch processing failed: ' + error.message, 'error');
+        }
+    }
+    
+    function openImageProcessor() {
+        if (selectedImages.size === 0) {
+            showNotification('No images selected', 'warning');
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('imageProcessorModal'));
+        modal.show();
+    }
+    
+    function downloadSelected() {
+        if (selectedImages.size === 0) {
+            showNotification('No images selected', 'warning');
+            return;
+        }
+        
+        showNotification(`Downloading ${selectedImages.size} images...`, 'info');
+        // Implementation for download would go here
+    }
+    
+    function deleteSelected() {
+        if (selectedImages.size === 0) {
+            showNotification('No images selected', 'warning');
+            return;
+        }
+        
+        if (confirm(`Are you sure you want to delete ${selectedImages.size} selected images? This cannot be undone.`)) {
+            showNotification(`Deleting ${selectedImages.size} images...`, 'info');
+            // Implementation for delete would go here
+            clearSelection();
+            loadImageGallery();
+        }
+    }
+    
+    function previewImage(imageId) {
+        showNotification('Image preview - Feature coming soon!', 'info');
+    }
+    
+    function downloadImage(imageId) {
+        showNotification('Downloading image...', 'info');
+    }
+    
+    function deleteImage(imageId) {
+        if (confirm('Are you sure you want to delete this image?')) {
+            showNotification('Deleting image...', 'info');
+            loadImageGallery();
+        }
+    }
+    
+    function pasteFromClipboard() {
+        navigator.clipboard.read().then(items => {
+            for (let item of items) {
+                for (let type of item.types) {
+                    if (type.startsWith('image/')) {
+                        item.getType(type).then(blob => {
+                            const file = new File([blob], 'pasted-image.png', { type: blob.type });
+                            uploadImages([file]);
+                        });
+                        return;
+                    }
+                }
+            }
+            showNotification('No image found in clipboard', 'warning');
+        }).catch(err => {
+            showNotification('Could not access clipboard', 'error');
+        });
+    }
+    
+    function renderPagination(pagination) {
+        const paginationNav = document.getElementById('gallery-pagination');
+        const paginationUl = paginationNav.querySelector('.pagination');
+        
+        if (pagination.total_pages <= 1) {
+            paginationNav.style.display = 'none';
+            return;
+        }
+        
+        paginationNav.style.display = 'block';
+        
+        let paginationHtml = '';
+        
+        // Previous button
+        if (pagination.has_previous) {
+            paginationHtml += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${pagination.page - 1})">Previous</a>
+                </li>
+            `;
+        }
+        
+        // Page numbers
+        const startPage = Math.max(1, pagination.page - 2);
+        const endPage = Math.min(pagination.total_pages, pagination.page + 2);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const active = i === pagination.page ? 'active' : '';
+            paginationHtml += `
+                <li class="page-item ${active}">
+                    <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                </li>
+            `;
+        }
+        
+        // Next button
+        if (pagination.has_next) {
+            paginationHtml += `
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(${pagination.page + 1})">Next</a>
+                </li>
+            `;
+        }
+        
+        paginationUl.innerHTML = paginationHtml;
+    }
+    
+    function changePage(page) {
+        currentPage = page;
+        loadImageGallery();
+    }
+    
+    function showProgressModal(message) {
+        document.getElementById('progress-message').textContent = message;
+        const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+        modal.show();
+    }
+    
+    function hideProgressModal() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('progressModal'));
+        if (modal) {
+            modal.hide();
+        }
+    }
+    
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; width: 350px;';
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+    
+    console.log('🖼️ Advanced Image Management Interface Loaded Successfully!');
+</script>
+{% endblock %}

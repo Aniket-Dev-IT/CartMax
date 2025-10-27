@@ -1,0 +1,145 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Categories Management{% endblock %}
+
+{% block page_title %}Categories Management{% endblock %}
+
+{% block content %}
+<!-- Stats Summary -->
+<div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stat-value">{{ categories|length }}</div>
+            <div class="stat-label">Total Categories</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-value">{{ categories|length }}</div>
+            <div class="stat-label">Active Categories</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-info-gradient">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="filters-bar">
+    <form method="get" class="row g-3">
+        <div class="col-lg-8 col-md-8">
+            <label for="search" class="form-label fw-bold">Search Categories</label>
+            <input type="text" id="search" name="search" class="form-control search-box" 
+                   placeholder="Search by category name..." value="{{ search|default:'' }}">
+        </div>
+        
+        <div class="col-lg-4 col-md-4 d-flex align-items-end">
+            <div class="w-100">
+                <button type="submit" class="btn btn-professional w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Categories Table -->
+<div class="dashboard-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">
+            <i class="fas fa-tags text-primary me-2"></i>
+            Categories List
+        </h3>
+        <div>
+            <a href="{% url 'admin_dashboard:category_create' %}" class="btn btn-professional">
+                <i class="fas fa-plus me-2"></i>Add New Category
+            </a>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th width="80px">Image</th>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Products</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th width="150px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" alt="{{ category.name }}" class="product-image">
+                        {% else %}
+                            <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="product-name">{{ category.name }}</div>
+                        {% if category.description %}
+                            <small class="text-muted">{{ category.description|truncatechars:50 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <code class="text-muted">{{ category.slug }}</code>
+                    </td>
+                    <td>
+                        <span class="badge bg-light text-dark">{{ category.products.count }} products</span>
+                    </td>
+                    <td>
+                        {% if category.is_active %}
+                            <span class="badge status-badge status-active">Active</span>
+                        {% else %}
+                            <span class="badge status-badge status-inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ category.created_at|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ category.created_at|time:"H:i" }}</small>
+                    </td>
+                    <td class="action-buttons">
+                        <a href="{% url 'admin_dashboard:category_edit' category.id %}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:category_delete' category.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No categories found</h5>
+                        <p class="text-muted">Start by creating your first product category.</p>
+                        <a href="{% url 'admin_dashboard:category_create' %}" class="btn btn-professional">
+                            <i class="fas fa-plus me-2"></i>Add First Category
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

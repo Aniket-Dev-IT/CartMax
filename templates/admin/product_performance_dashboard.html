@@ -1,0 +1,337 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Product Performance Dashboard{% endblock %}
+
+{% block page_title %}Performance Analytics{% endblock %}
+
+{% block content %}
+<!-- Performance Overview -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-value">{{ best_sellers|length }}</div>
+            <div class="stat-label">Best Sellers</div>
+            <small class="text-muted">Top performing products</small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">{{ stock_alerts|length }}</div>
+            <div class="stat-label">Low Stock Items</div>
+            <small class="text-muted">Need attention</small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-danger-gradient">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-value">{{ out_of_stock }}</div>
+            <div class="stat-label">Out of Stock</div>
+            <small class="text-muted">Immediate restock needed</small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-value">{{ highly_rated|length }}</div>
+            <div class="stat-label">Highly Rated</div>
+            <small class="text-muted">4.5+ star products</small>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Tables -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-crown text-success me-2"></i>
+                    Best Selling Products
+                </h3>
+                <small class="text-muted">Last 30 days</small>
+            </div>
+            <div class="card-body">
+                {% if best_sellers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Units Sold</th>
+                                    <th class="text-center">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in best_sellers|slice:":8" %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-success rounded-circle me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">
+                                                {{ forloop.counter }}
+                                            </div>
+                                            <div>
+                                                <strong class="d-block">{{ product.name|truncatechars:30 }}</strong>
+                                                <small class="text-muted">₹{{ product.price }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ product.units_sold|default:"0" }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong class="text-success">₹{{ product.revenue|default:"0"|floatformat:0 }}</strong>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Sales Data</h5>
+                        <p class="text-muted">No order data available for the last 30 days.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Inventory Alerts
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if stock_alerts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Stock Level</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in stock_alerts|slice:":8" %}
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong class="d-block">{{ product.name|truncatechars:30 }}</strong>
+                                            <small class="text-muted">₹{{ product.price }}</small>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-{% if product.stock <= 3 %}danger{% elif product.stock <= 7 %}warning{% else %}info{% endif %}">
+                                            {{ product.stock }} units
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if product.stock == 0 %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% elif product.stock <= 3 %}
+                                            <span class="badge bg-danger">Critical</span>
+                                        {% elif product.stock <= 7 %}
+                                            <span class="badge bg-warning">Low</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Reorder Soon</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">All Good!</h5>
+                        <p class="text-muted">All products have sufficient stock levels.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Ratings & Reviews -->
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Highly Rated Products
+                </h3>
+                <small class="text-muted">4.5+ stars</small>
+            </div>
+            <div class="card-body">
+                {% if highly_rated %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Rating</th>
+                                    <th class="text-center">Reviews</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in highly_rated|slice:":6" %}
+                                <tr>
+                                    <td>
+                                        <strong class="d-block">{{ product.name|truncatechars:30 }}</strong>
+                                        <small class="text-muted">₹{{ product.price }}</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <span class="text-warning me-1">{{ product.avg_rating|floatformat:1 }}</span>
+                                            <i class="fas fa-star text-warning"></i>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info">{{ product.review_count }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Highly Rated Products</h5>
+                        <p class="text-muted">No products with 4.5+ stars and sufficient reviews yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="dashboard-card h-100">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-chart-bar text-info me-2"></i>
+                    Category Performance
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if category_performance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-info">
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-center">Products</th>
+                                    <th class="text-center">Avg Rating</th>
+                                    <th class="text-center">Orders</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in category_performance|slice:":6" %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-info rounded-circle p-1 me-2 text-white" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 10px;">
+                                                {{ category.name|first }}
+                                            </div>
+                                            <strong>{{ category.name }}</strong>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{ category.product_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if category.avg_rating %}
+                                            <div class="d-flex align-items-center justify-content-center">
+                                                <span class="text-warning me-1">{{ category.avg_rating|floatformat:1 }}</span>
+                                                <i class="fas fa-star text-warning"></i>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success">{{ category.total_orders|default:"0" }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-layer-group fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Category Data</h5>
+                        <p class="text-muted">No category performance data available.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Features Info -->
+<div class="row">
+    <div class="col-12">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-rocket text-info me-2"></i>
+                    Coming Soon Features
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line fa-2x text-primary mb-2"></i>
+                            <h6>Sales Trends</h6>
+                            <small class="text-muted">Historical sales analysis and forecasting</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-2x text-success mb-2"></i>
+                            <h6>Customer Insights</h6>
+                            <small class="text-muted">Customer behavior and preferences</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-warehouse fa-2x text-warning mb-2"></i>
+                            <h6>Inventory Forecasting</h6>
+                            <small class="text-muted">Smart inventory management</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="text-center">
+                            <i class="fas fa-brain fa-2x text-info mb-2"></i>
+                            <h6>AI Recommendations</h6>
+                            <small class="text-muted">Product optimization suggestions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Delete Coupon - {{ coupon.coupon_code }}{% endblock %}
+
+{% block page_title %}Delete Coupon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="dashboard-card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Delete Coupon
+                </h3>
+            </div>
+            
+            <div class="card-body">
+                <div class="alert alert-danger mb-4">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone!
+                </div>
+                
+                <p>Are you sure you want to permanently delete the coupon <strong>{{ coupon.coupon_code }}</strong>?</p>
+                
+                <div class="alert alert-info mb-4">
+                    <h6 class="mb-2">Coupon Details:</h6>
+                    <ul class="mb-0">
+                        <li><strong>Code:</strong> {{ coupon.coupon_code }}</li>
+                        <li><strong>Discount:</strong> {{ coupon.discount_value }} {% if coupon.discount_type == 'percentage' %}%{% else %}₹{% endif %}</li>
+                        <li><strong>Status:</strong> {% if coupon.is_active %}Active{% else %}Inactive{% endif %}</li>
+                        <li><strong>Total Uses:</strong> {{ coupon.usage_count }}</li>
+                    </ul>
+                </div>
+                
+                <form method="post" class="mb-0">
+                    {% csrf_token %}
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="confirm_checkbox" name="confirm_delete" required>
+                        <label class="form-check-label" for="confirm_checkbox">
+                            I understand this will permanently delete this coupon
+                        </label>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'admin_dashboard:coupon_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-2"></i>Delete Coupon
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

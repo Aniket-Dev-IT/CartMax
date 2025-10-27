@@ -1,0 +1,171 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px;">
+    <h1>{{ title }}</h1>
+    
+    <div style="background: #e7f3ff; border: 1px solid #b8daff; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3 style="margin: 0 0 10px 0; color: #0c5460;">🧠 Smart Pricing Analysis</h3>
+        <p style="margin: 0; color: #0c5460;">
+            This analysis compares your product prices with category averages and provides strategic recommendations 
+            based on stock levels and market positioning.
+        </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; text-align: center;">
+            <h4 style="margin: 0 0 10px 0; color: #28a745;">Premium Products</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #28a745;">
+                {{ analysis_data|length|add:"-10"|default:"0" }}
+            </div>
+            <small>Above market average</small>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; text-align: center;">
+            <h4 style="margin: 0 0 10px 0; color: #ffc107;">Competitive Products</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #ffc107;">
+                {{ analysis_data|length|add:"-5"|default:"0" }}
+            </div>
+            <small>Near market average</small>
+        </div>
+        <div style="background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; text-align: center;">
+            <h4 style="margin: 0 0 10px 0; color: #dc3545;">Budget Products</h4>
+            <div style="font-size: 24px; font-weight: bold; color: #dc3545;">
+                {{ analysis_data|length|add:"-15"|default:"0" }}
+            </div>
+            <small>Below market average</small>
+        </div>
+    </div>
+
+    <div style="background: white; border-radius: 5px; border: 1px solid #ddd; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa;">
+                    <th style="padding: 15px; text-align: left; border-bottom: 1px solid #ddd;">Product</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 1px solid #ddd;">Current Price</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 1px solid #ddd;">Category Avg</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 1px solid #ddd;">Position</th>
+                    <th style="padding: 15px; text-align: center; border-bottom: 1px solid #ddd;">Stock</th>
+                    <th style="padding: 15px; text-align: left; border-bottom: 1px solid #ddd;">Recommendations</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in analysis_data %}
+                <tr style="{% cycle 'background: #f9f9f9;' '' %}">
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">
+                        <strong>{{ item.product.name }}</strong><br>
+                        <small style="color: #666;">{{ item.product.category.name }}</small>
+                    </td>
+                    <td style="padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: bold; color: #007cba;">₹{{ item.product.price }}</div>
+                        {% if item.product.original_price %}
+                            <small style="color: #666; text-decoration: line-through;">₹{{ item.product.original_price }}</small>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee;">
+                        {% if item.category_avg > 0 %}
+                            <div style="color: #6c757d;">₹{{ item.category_avg|floatformat:0 }}</div>
+                            <small style="color: {% if item.price_vs_avg > 0 %}#dc3545{% elif item.price_vs_avg < 0 %}#28a745{% else %}#6c757d{% endif %};">
+                                {% if item.price_vs_avg > 0 %}+{% endif %}{{ item.price_vs_avg|floatformat:1 }}%
+                            </small>
+                        {% else %}
+                            <span style="color: #999;">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee;">
+                        <span style="padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; 
+                                     background: {% if item.positioning == 'Premium' %}#d4edda; color: #155724;{% elif item.positioning == 'Budget' %}#f8d7da; color: #721c24;{% elif item.positioning == 'Competitive' %}#fff3cd; color: #856404;{% else %}#e2e3e5; color: #6c757d;{% endif %}">
+                            {{ item.positioning }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px 15px; text-align: center; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: bold; color: {% if item.product.stock > 50 %}#28a745{% elif item.product.stock < 5 %}#dc3545{% else %}#ffc107{% endif %};">
+                            {{ item.product.stock }}
+                        </div>
+                        <small style="color: #666;">units</small>
+                    </td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #eee;">
+                        <div style="margin-bottom: 5px;">
+                            <strong>Pricing:</strong> {{ item.recommendation }}
+                        </div>
+                        <div>
+                            <strong>Stock:</strong> {{ item.stock_recommendation }}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ddd;">
+            <h4>💡 Key Insights</h4>
+            <ul style="margin: 0;">
+                <li>Premium products may have room for higher margins but check demand</li>
+                <li>Budget products could be underpriced - consider gradual increases</li>
+                <li>High stock items might benefit from promotional pricing</li>
+                <li>Low stock items are candidates for price optimization</li>
+            </ul>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; border: 1px solid #ffeaa7;">
+            <h4>⚠️ Action Items</h4>
+            <ul style="margin: 0;">
+                <li>Review premium positioning for high-stock items</li>
+                <li>Consider price increases for consistently low-stock products</li>
+                <li>Analyze competitor prices for better market positioning</li>
+                <li>Set up automated alerts for price optimization opportunities</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'admin:store_product_changelist' %}" 
+           style="background: #007cba; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px; margin-right: 10px;">
+            ← Back to Products
+        </a>
+        
+        <button onclick="exportAnalysis()" 
+                style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer;">
+            📊 Export Analysis
+        </button>
+    </div>
+</div>
+
+<script>
+    function exportAnalysis() {
+        const rows = [
+            ['Product', 'Category', 'Current Price', 'Category Average', 'Price vs Average %', 'Position', 'Stock', 'Pricing Recommendation', 'Stock Recommendation']
+        ];
+        
+        {% for item in analysis_data %}
+        rows.push([
+            '{{ item.product.name|escapejs }}',
+            '{{ item.product.category.name|escapejs }}',
+            '{{ item.product.price }}',
+            '{{ item.category_avg|floatformat:2|default:"-" }}',
+            '{{ item.price_vs_avg|floatformat:1 }}',
+            '{{ item.positioning|escapejs }}',
+            '{{ item.product.stock }}',
+            '{{ item.recommendation|escapejs }}',
+            '{{ item.stock_recommendation|escapejs }}'
+        ]);
+        {% endfor %}
+        
+        let csvContent = rows.map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "smart_pricing_analysis.csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+{% endblock %}

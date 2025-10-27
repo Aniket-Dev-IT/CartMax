@@ -1,0 +1,395 @@
+{% load cart_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - CartMax</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .invoice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Header Section */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0ea5e9;
+        }
+        
+        .company-info h1 {
+            font-size: 32px;
+            color: #0ea5e9;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+        
+        .company-info p {
+            font-size: 13px;
+            color: #666;
+            margin: 3px 0;
+        }
+        
+        .invoice-status {
+            text-align: right;
+        }
+        
+        .invoice-number {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .invoice-date {
+            font-size: 13px;
+            color: #666;
+            margin: 3px 0;
+        }
+        
+        /* Addresses Section */
+        .addresses-section {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .address-block {
+            flex: 1;
+        }
+        
+        .address-block h3 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .address-content {
+            font-size: 13px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .address-content p {
+            margin: 4px 0;
+        }
+        
+        /* Items Table */
+        .items-section {
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        thead {
+            background-color: #f9fafb;
+        }
+        
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        td {
+            padding: 16px 12px;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        tr:last-child td {
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .item-name {
+            font-weight: 500;
+            color: #000;
+        }
+        
+        .item-sku {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .text-right {
+            text-align: right;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* Totals Section */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+        }
+        
+        .totals-box {
+            width: 350px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        /* Print/Download Button */
+        .invoice-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0284c7;
+        }
+        
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        
+        @media print {
+            .invoice-actions {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function downloadPDF() {
+            window.print();
+        }
+    </script>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Action Buttons -->
+        <div class="invoice-actions">
+            <button class="btn btn-primary" onclick="downloadPDF()">📥 Download PDF</button>
+            <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+        </div>
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="company-info">
+                <h1>CartMax</h1>
+                <p>Your Online Shopping Hub</p>
+            </div>
+            <div class="invoice-status">
+                <div class="invoice-number">INVOICE</div>
+                <div class="invoice-date">Order #{{ order.order_id }}</div>
+            </div>
+        </div>
+
+        <!-- Invoice Meta -->
+        <div style="margin-bottom: 30px; font-size: 13px; color: #666;">
+            <strong>Invoice Date:</strong> {{ order.created_at|date:"F d, Y" }} | <strong>Status:</strong> <span style="color: #333; font-weight: 600;">{{ order.get_status_display }}</span>
+        </div>
+
+        <!-- Addresses -->
+        <div class="addresses-section">
+            <div class="address-block">
+                <h3>BILL TO:</h3>
+                <div class="address-content">
+                    <p><strong>{{ order.first_name }} {{ order.last_name }}</strong></p>
+                    <p>{{ order.email }}</p>
+                    <p>{{ order.phone }}</p>
+                </div>
+            </div>
+            <div class="address-block">
+                <h3>SHIP TO:</h3>
+                <div class="address-content">
+                    <p><strong>{{ order.address }}</strong></p>
+                    <p>{{ order.city }}, {{ order.postal_code }}</p>
+                    <p>{{ order.country }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Line Separator -->
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+        <!-- Items Table -->
+        <div class="items-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>PRODUCT NAME</th>
+                        <th class="text-center" style="width: 80px;">QTY</th>
+                        <th class="text-right" style="width: 120px;">UNIT PRICE</th>
+                        <th class="text-right" style="width: 100px;">DISCOUNT</th>
+                        <th class="text-right" style="width: 100px;">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_items %}
+                    <tr>
+                        <td>
+                            <div class="item-name">{{ item.product.name }}</div>
+                            <div class="item-sku">SKU: {{ item.product.sku }}</div>
+                        </td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-right">
+                            {% if order.currency == 'INR' %}
+                                {% with price=item.price_inr|default:item.product.price_inr %}
+                                    ₹{{ price|floatformat:2 }}
+                                {% endwith %}
+                            {% else %}
+                                {% with price=item.price_usd|default:item.product.price_usd %}
+                                    ${{ price|floatformat:2 }}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if order.discount_amount > 0 %}
+                                {% if order.currency == 'INR' %}
+                                    -₹{{ order.discount_amount|floatformat:2 }}
+                                {% else %}
+                                    -${{ order.discount_amount|floatformat:2 }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if order.currency == 'INR' %}
+                                {% with price=item.price_inr|default:item.product.price_inr %}
+                                    {% with line_total=item.quantity|mul:price %}
+                                        ₹{{ line_total|floatformat:2 }}
+                                    {% endwith %}
+                                {% endwith %}
+                            {% else %}
+                                {% with price=item.price_usd|default:item.product.price_usd %}
+                                    {% with line_total=item.quantity|mul:price %}
+                                        ${{ line_total|floatformat:2 }}
+                                    {% endwith %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="totals-box">
+                <div class="total-row">
+                    <span><strong>Subtotal:</strong></span>
+                    <span class="text-right">
+                        {% if order.currency == 'INR' %}
+                            ₹{{ order.original_subtotal|floatformat:2 }}
+                        {% else %}
+                            ${{ order.original_subtotal|floatformat:2 }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% if order.discount_amount > 0 %}
+                <div class="total-row">
+                    <span><strong>Discount:</strong></span>
+                    <span class="text-right" style="color: #10b981;">
+                        {% if order.currency == 'INR' %}
+                            -₹{{ order.discount_amount|floatformat:2 }}
+                        {% else %}
+                            -${{ order.discount_amount|floatformat:2 }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                <div class="total-row">
+                    <span><strong>Shipping:</strong></span>
+                    <span class="text-right">FREE</span>
+                </div>
+                <div class="total-row">
+                    <span><strong>Tax ({{ tax_percentage }}%):</strong></span>
+                    <span class="text-right">
+                        {% if order.currency == 'INR' %}
+                            ₹{{ order.tax_amount|floatformat:2 }}
+                        {% else %}
+                            ${{ order.tax_amount|floatformat:2 }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="total-row" style="background-color: #0ea5e9; color: white; font-weight: 600; border: none; font-size: 16px; padding: 16px;">
+                    <span>TOTAL:</span>
+                    <span>
+                        {% if order.currency == 'INR' %}
+                            ₹{{ order.total|floatformat:2 }}
+                        {% else %}
+                            ${{ order.total|floatformat:2 }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #666; font-size: 12px;">
+            <p><strong>Thank you for shopping with CartMax!</strong></p>
+            <p>For support, contact: support@cartmax.com</p>
+        </div>
+    </div>
+</body>
+</html>

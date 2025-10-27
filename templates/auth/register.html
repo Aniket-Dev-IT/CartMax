@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - CartMax{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="auth-card">
+                <!-- CartMax Logo -->
+                <div class="text-center mb-4">
+                    <div class="auth-logo">
+                        <div class="cartmax-logo-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <span class="cartmax-wordmark">CartMax</span>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Create Account</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- First Name -->
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                <div class="invalid-feedback">
+                                    Please provide your first name.
+                                </div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                <div class="invalid-feedback">
+                                    Please provide your last name.
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+
+                            <!-- Username -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required minlength="3">
+                                <div class="invalid-feedback">
+                                    Username must be at least 3 characters long.
+                                </div>
+                                <small class="form-text text-muted">Choose a unique username (3-150 characters).</small>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label for="password1" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password1" name="password1" required minlength="8">
+                                <div class="invalid-feedback">
+                                    Password must be at least 8 characters long.
+                                </div>
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="password2" name="password2" required>
+                                <div class="invalid-feedback">
+                                    Please confirm your password.
+                                </div>
+                            </div>
+
+                            <!-- Phone (Optional) -->
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number (Optional)</label>
+                                <input type="tel" class="form-control" id="phone" name="phone">
+                                <small class="form-text text-muted">We'll use this for order updates.</small>
+                            </div>
+
+                            <!-- Terms Agreement -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
+                                        and <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                    </label>
+                                    <div class="invalid-feedback">
+                                        You must agree to the terms and conditions.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-cartmax btn-lg w-100">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </form>
+
+                        <!-- Display Form Errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger mt-3">
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center mt-4">
+                    <p class="mb-0">Already have an account? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-bold">Sign In</a>
+                    </p>
+                </div>
+
+                <!-- Or Continue as Guest -->
+                <div class="text-center mt-3">
+                    <p class="mb-0 text-muted">
+                        <a href="{% url 'store:homepage' %}" class="text-decoration-none">Continue as Guest</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* CartMax Modern Registration Styles */
+.auth-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+.cartmax-logo-icon {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3);
+}
+
+.cartmax-wordmark {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%);
+    color: white;
+    border-bottom: none;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.75rem;
+}
+
+.form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.form-control:focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    outline: none;
+}
+
+.btn-cartmax {
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3);
+}
+
+.btn-cartmax:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(14, 165, 233, 0.4);
+    color: white;
+}
+
+.btn-cartmax:active {
+    transform: translateY(0);
+}
+
+.form-check-input:checked {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.25);
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    border: 2px solid #fecaca;
+    color: #dc2626;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.alert ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    margin-top: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.strength-weak {
+    color: #ef4444;
+}
+
+.strength-medium {
+    color: #f59e0b;
+}
+
+.strength-strong {
+    color: #10b981;
+}
+
+/* Links */
+a {
+    color: #0ea5e9;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #d946ef;
+    text-decoration: none;
+}
+
+.form-text {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.text-muted {
+    color: #64748b !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 576px) {
+    .auth-card {
+        margin: 0 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .cartmax-wordmark {
+        font-size: 2rem;
+    }
+    
+    .cartmax-logo-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .form-control {
+        padding: 12px 16px;
+        font-size: 16px; /* Prevent iOS zoom */
+    }
+}
+
+/* Animation */
+.auth-card {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Password matching validation
+    $('#password2').on('input', function() {
+        const password1 = $('#password1').val();
+        const password2 = $(this).val();
+        
+        if (password2 && password1 !== password2) {
+            $(this).addClass('is-invalid');
+            $(this).siblings('.invalid-feedback').text('Passwords do not match.');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
+    });
+    
+    // Password strength indicator
+    $('#password1').on('input', function() {
+        const password = $(this).val();
+        const strength = getPasswordStrength(password);
+        
+        // Remove existing strength indicator
+        $(this).siblings('.password-strength').remove();
+        
+        if (password.length > 0) {
+            let strengthText = '';
+            let strengthClass = '';
+            
+            if (strength < 3) {
+                strengthText = 'Weak password';
+                strengthClass = 'strength-weak';
+            } else if (strength < 5) {
+                strengthText = 'Medium password';
+                strengthClass = 'strength-medium';
+            } else {
+                strengthText = 'Strong password';
+                strengthClass = 'strength-strong';
+            }
+            
+            $(this).after(`<div class="password-strength ${strengthClass}">${strengthText}</div>`);
+        }
+    });
+    
+    // Calculate password strength
+    function getPasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (password.match(/[a-z]/)) strength++;
+        if (password.match(/[A-Z]/)) strength++;
+        if (password.match(/[0-9]/)) strength++;
+        if (password.match(/[^a-zA-Z0-9]/)) strength++;
+        
+        return strength;
+    }
+    
+    // Username availability check (optional enhancement)
+    $('#username').on('blur', function() {
+        const username = $(this).val();
+        if (username.length >= 3) {
+            // Could add AJAX check for username availability
+        }
+    });
+    
+    // Form validation
+    $('form.needs-validation').on('submit', function(e) {
+        const form = this;
+        
+        // Check password matching
+        const password1 = $('#password1').val();
+        const password2 = $('#password2').val();
+        
+        if (password1 !== password2) {
+            e.preventDefault();
+            e.stopPropagation();
+            $('#password2').addClass('is-invalid');
+            $('#password2').siblings('.invalid-feedback').text('Passwords do not match.');
+        }
+        
+        // Standard HTML5 validation
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        $(form).addClass('was-validated');
+    });
+});
+</script>
+{% endblock %}

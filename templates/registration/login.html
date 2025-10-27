@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In - CartMax{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="auth-card">
+                <!-- CartMax Logo -->
+                <div class="text-center mb-4">
+                    <div class="auth-logo">
+                        <div class="cartmax-logo-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <span class="cartmax-wordmark">CartMax</span>
+                    </div>
+                </div>
+
+                <!-- Login Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title mb-0">Sign In</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Username/Email -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Email or Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required autofocus>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+
+                            <!-- Remember Me -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                    <label class="form-check-label" for="remember">
+                                        Keep me signed in
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-cartmax btn-lg w-100">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                        </form>
+
+                        <!-- Forgot Password Link -->
+                        <div class="text-center mt-3">
+                            <a href="#" class="text-decoration-none" onclick="alert('Password reset feature coming soon!')">
+                                Forgot your password?
+                            </a>
+                        </div>
+
+                        <!-- Display Form Errors -->
+                        {% if form.errors %}
+                        <div class="alert alert-danger mt-3">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Registration Link -->
+                <div class="text-center mt-4">
+                    <p class="mb-0">New to CartMax? 
+                        <a href="{% url 'store:register' %}" class="text-decoration-none fw-bold">Create Account</a>
+                    </p>
+                </div>
+
+                <!-- Continue as Guest -->
+                <div class="text-center mt-3">
+                    <p class="mb-0 text-muted">
+                        <a href="{% url 'store:homepage' %}" class="text-decoration-none">Continue as Guest</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+/* CartMax Modern Login Styles */
+.auth-card {
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+.cartmax-logo-icon {
+    width: 3rem;
+    height: 3rem;
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3);
+}
+
+.cartmax-wordmark {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #d946ef 100%);
+    color: white;
+    border-bottom: none;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+.card-body {
+    padding: 2.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.75rem;
+}
+
+.form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    font-size: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.form-control:focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    outline: none;
+}
+
+.btn-cartmax {
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.3);
+}
+
+.btn-cartmax:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(14, 165, 233, 0.4);
+    color: white;
+}
+
+.btn-cartmax:active {
+    transform: translateY(0);
+}
+
+.form-check-input:checked {
+    background-color: #0ea5e9;
+    border-color: #0ea5e9;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.25);
+}
+
+.alert-danger {
+    background-color: #fee2e2;
+    border: 2px solid #fecaca;
+    color: #dc2626;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+a {
+    color: #0ea5e9;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #d946ef;
+    text-decoration: none;
+}
+
+.text-muted {
+    color: #64748b !important;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 576px) {
+    .auth-card {
+        margin: 0 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .cartmax-wordmark {
+        font-size: 2rem;
+    }
+    
+    .cartmax-logo-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .form-control {
+        padding: 12px 16px;
+        font-size: 16px; /* Prevent iOS zoom */
+    }
+}
+
+/* Animation */
+.auth-card {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock %}

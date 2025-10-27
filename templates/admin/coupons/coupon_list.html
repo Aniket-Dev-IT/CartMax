@@ -1,0 +1,236 @@
+{% extends "admin/professional_base.html" %}
+
+{% block title %}Discount Coupons Management{% endblock %}
+
+{% block page_title %}Discount Coupons Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.coupon-status-active { background: #d1fae5; color: #065f46; }
+.coupon-status-inactive { background: #fee2e2; color: #991b1b; }
+.coupon-type-percentage { background: #dbeafe; color: #1e40af; }
+.coupon-type-fixed { background: #f3e8ff; color: #7c2d12; }
+.coupon-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Summary -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-primary-gradient">
+                <i class="fas fa-ticket-alt"></i>
+            </div>
+            <div class="stat-value">{{ total_count }}</div>
+            <div class="stat-label">Total Coupons</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-success-gradient">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ coupons|length }}</div>
+            <div class="stat-label">Active Coupons</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-info-gradient">
+                <i class="fas fa-percentage"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Percentage Discounts</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="dashboard-card text-center">
+            <div class="card-icon bg-warning-gradient">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Fixed Amount Discounts</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="filters-bar">
+    <form method="get" class="row g-3 mb-3">
+        <div class="col-lg-6 col-md-6">
+            <label for="search" class="form-label fw-bold">Search Coupons</label>
+            <input type="text" id="search" name="search" class="form-control search-box" 
+                   placeholder="Search by coupon code or description..." value="{{ search|default:'' }}">
+        </div>
+        
+        <div class="col-lg-3 col-md-3">
+            <label for="status" class="form-label fw-bold">Status</label>
+            <select id="status" name="status" class="form-select filter-select">
+                <option value="">All Coupons</option>
+                <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+                <option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option>
+            </select>
+        </div>
+        
+        <div class="col-lg-3 col-md-3 d-flex align-items-end">
+            <div class="w-100">
+                <button type="submit" class="btn btn-professional w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="d-flex justify-content-end">
+        <a href="{% url 'admin_dashboard:coupon_create' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Create New Coupon
+        </a>
+    </div>
+</div>
+
+<!-- Coupons Table -->
+<div class="dashboard-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">
+            <i class="fas fa-ticket-alt text-primary me-2"></i>
+            Discount Coupons
+        </h3>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-modern table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Coupon Code</th>
+                    <th>Discount</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Usage</th>
+                    <th>Expires</th>
+                    <th width="150px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr>
+                    <td>
+                        <strong class="text-primary">{{ coupon.coupon_code }}</strong>
+                        <br>
+                        <small class="text-muted">{{ coupon.description|truncatewords:5 }}</small>
+                    </td>
+                    <td>
+                        <strong>{{ coupon.discount_value }}</strong>
+                        {% if coupon.discount_type == 'percentage' %}
+                            <span class="text-info">%</span>
+                        {% else %}
+                            <span class="text-info">₹</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if coupon.discount_type == 'percentage' %}
+                            <span class="coupon-badge coupon-type-percentage">
+                                <i class="fas fa-percentage me-1"></i>Percentage
+                            </span>
+                        {% else %}
+                            <span class="coupon-badge coupon-type-fixed">
+                                <i class="fas fa-gift me-1"></i>Fixed Amount
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if coupon.is_active %}
+                            <span class="coupon-badge coupon-status-active">
+                                <i class="fas fa-check me-1"></i>Active
+                            </span>
+                        {% else %}
+                            <span class="coupon-badge coupon-status-inactive">
+                                <i class="fas fa-times me-1"></i>Inactive
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if coupon.max_usage_limit %}
+                            <div>{{ coupon.usage_count }}/{{ coupon.max_usage_limit }}</div>
+                            <small class="text-muted">Used {{ coupon.usage_count }} times</small>
+                        {% else %}
+                            <div>{{ coupon.usage_count }}/∞</div>
+                            <small class="text-muted">Unlimited</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if coupon.expiration_date %}
+                            <div>{{ coupon.expiration_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ coupon.expiration_date|time:"H:i" }}</small>
+                        {% else %}
+                            <span class="text-muted">No expiration</span>
+                        {% endif %}
+                    </td>
+                    <td class="action-buttons">
+                        <a href="{% url 'admin_dashboard:coupon_detail' coupon.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:coupon_edit' coupon.id %}" class="btn btn-sm btn-outline-warning">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'admin_dashboard:coupon_delete' coupon.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="fas fa-ticket-alt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No coupons found</h5>
+                        <p class="text-muted">No discount coupons match your search criteria.</p>
+                        <a href="{% url 'admin_dashboard:coupon_create' %}" class="btn btn-sm btn-primary mt-3">
+                            <i class="fas fa-plus me-2"></i>Create First Coupon
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+{% endblock %}

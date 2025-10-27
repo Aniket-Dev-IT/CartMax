@@ -1,0 +1,81 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px;">
+    <h1>{{ title }}</h1>
+    
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <h3>Selected Products ({{ products|length }})</h3>
+        <ul style="max-height: 200px; overflow-y: auto; background: white; padding: 10px; border-radius: 3px;">
+            {% for product in products %}
+                <li><strong>{{ product.name }}</strong> - Current Price: ₹{{ product.price }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form method="post" style="background: white; padding: 20px; border-radius: 5px; border: 1px solid #ddd;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 20px;">
+            <h3>Price Update Options</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="price_change_type" style="display: block; margin-bottom: 5px; font-weight: bold;">Update Type:</label>
+                <select name="price_change_type" id="price_change_type" style="padding: 8px; border: 1px solid #ccc; border-radius: 3px; width: 200px;">
+                    <option value="percentage">Percentage Change (%)</option>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="price_change_value" style="display: block; margin-bottom: 5px; font-weight: bold;">Change Value:</label>
+                <input type="number" name="price_change_value" id="price_change_value" step="0.01" placeholder="e.g., 10 for 10% increase or 100 for ₹100 increase" 
+                       style="padding: 8px; border: 1px solid #ccc; border-radius: 3px; width: 300px;" required>
+                <small style="display: block; color: #666; margin-top: 5px;">
+                    Use positive values to increase prices, negative to decrease. 
+                    <br>Example: 10 = 10% increase, -5 = 5% decrease
+                </small>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center;">
+                    <input type="checkbox" name="update_original" value="true" style="margin-right: 8px;">
+                    <span>Set current price as original price (for discount calculation)</span>
+                </label>
+                <small style="color: #666; margin-left: 20px;">
+                    Check this if you want to preserve the current price as the original price before applying changes.
+                </small>
+            </div>
+        </div>
+        
+        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <strong>⚠️ Important:</strong> This action will immediately update the prices of all selected products. 
+            Make sure you have reviewed the price change values carefully.
+        </div>
+        
+        <div>
+            <button type="submit" name="apply" value="1" 
+                    style="background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 3px; cursor: pointer; margin-right: 10px;">
+                Apply Price Updates
+            </button>
+            <a href="{% url 'admin:store_product_changelist' %}" 
+               style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 3px;">
+                Cancel
+            </a>
+        </div>
+    </form>
+    
+    <script>
+        document.getElementById('price_change_type').addEventListener('change', function() {
+            const input = document.getElementById('price_change_value');
+            const placeholder = this.value === 'percentage' 
+                ? 'e.g., 10 for 10% increase or -5 for 5% decrease'
+                : 'e.g., 100 for ₹100 increase or -50 for ₹50 decrease';
+            input.placeholder = placeholder;
+        });
+    </script>
+</div>
+{% endblock %}
