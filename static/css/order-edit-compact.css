@@ -1,0 +1,247 @@
+/* AGGRESSIVE SPACING OPTIMIZATION FOR ORDER EDIT PAGE */
+
+/* Reduce main content padding */
+.admin-content {
+    padding: 12px !important;
+}
+
+/* Compact dashboard cards */
+.dashboard-card {
+    margin-bottom: 8px !important;
+    padding: 10px !important;
+}
+
+.dashboard-card .card-header {
+    margin-bottom: 8px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.dashboard-card .card-body {
+    padding: 0 !important;
+}
+
+.dashboard-card .card-title {
+    font-size: 14px !important;
+    margin: 0 !important;
+}
+
+/* Compact form spacing */
+.dashboard-card .row {
+    margin-right: -5px !important;
+    margin-left: -5px !important;
+}
+
+.dashboard-card .row > [class*='col-'] {
+    padding-right: 5px !important;
+    padding-left: 5px !important;
+    margin-bottom: 6px !important;
+}
+
+.dashboard-card .mb-2 {
+    margin-bottom: 6px !important;
+}
+
+.dashboard-card .mb-3 {
+    margin-bottom: 6px !important;
+}
+
+.dashboard-card label {
+    margin-bottom: 3px !important;
+    font-size: 13px !important;
+}
+
+.dashboard-card .form-control,
+.dashboard-card .form-select {
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+    height: auto !important;
+    min-height: 28px !important;
+}
+
+.dashboard-card textarea.form-control {
+    padding: 6px 10px !important;
+    font-size: 13px !important;
+}
+
+.dashboard-card small {
+    font-size: 11px !important;
+    display: block !important;
+    margin-top: 2px !important;
+}
+
+/* Compact table */
+.dashboard-card .table {
+    margin-bottom: 0 !important;
+    font-size: 13px !important;
+}
+
+.dashboard-card .table thead th {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.dashboard-card .table td {
+    padding: 6px 8px !important;
+    vertical-align: middle !important;
+}
+
+.dashboard-card .table img {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+/* Compact buttons */
+.dashboard-card .btn {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    min-height: 28px !important;
+    margin-bottom: 4px !important;
+}
+
+.dashboard-card .btn-sm {
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+}
+
+/* Compact sidebar cards */
+.col-lg-4 .dashboard-card {
+    margin-bottom: 8px !important;
+}
+
+.col-lg-4 .dashboard-card .text-center {
+    padding: 8px !important;
+}
+
+.col-lg-4 .dashboard-card h4,
+.col-lg-4 .dashboard-card h5 {
+    font-size: 14px !important;
+    margin: 0 !important;
+}
+
+.col-lg-4 .dashboard-card .row {
+    margin-bottom: 6px !important;
+}
+
+.col-lg-4 .dashboard-card hr {
+    margin: 6px 0 !important;
+}
+
+.col-lg-4 .dashboard-card .mb-2,
+.col-lg-4 .dashboard-card .mb-3 {
+    margin-bottom: 6px !important;
+}
+
+.col-lg-4 .dashboard-card strong {
+    font-size: 13px !important;
+}
+
+.col-lg-4 .dashboard-card span,
+.col-lg-4 .dashboard-card small {
+    font-size: 12px !important;
+}
+
+.col-lg-4 .dashboard-card code {
+    font-size: 11px !important;
+}
+
+/* Compact grid gap for buttons */
+.d-grid.gap-1 {
+    gap: 4px !important;
+}
+
+.d-grid.gap-2 {
+    gap: 4px !important;
+}
+
+/* Badge sizing */
+.badge {
+    padding: 2px 6px !important;
+    font-size: 10px !important;
+}
+
+/* Modal compact */
+.modal-header {
+    padding: 8px 12px !important;
+}
+
+.modal-body {
+    padding: 10px !important;
+}
+
+.modal-footer {
+    padding: 8px 12px !important;
+    gap: 4px !important;
+}
+
+.modal-title {
+    font-size: 14px !important;
+}
+
+.modal-body .alert {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+    font-size: 13px !important;
+}
+
+.modal-body p {
+    margin-bottom: 4px !important;
+    font-size: 13px !important;
+}
+
+.modal-body code {
+    font-size: 12px !important;
+}
+
+/* History timeline compact */
+.history-timeline {
+    position: relative;
+}
+
+.history-item {
+    padding: 2px 0 !important;
+    border-left: 2px solid #e9ecef;
+    padding-left: 10px !important;
+    margin-left: 0.5rem;
+    position: relative;
+    margin-bottom: 2px !important;
+}
+
+.history-item:before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 4px;
+    width: 5px;
+    height: 5px;
+    background-color: #6c757d;
+    border-radius: 50%;
+}
+
+.history-time {
+    font-size: 11px !important;
+    color: #6c757d;
+    line-height: 1.2 !important;
+}
+
+.history-action {
+    font-weight: 500;
+    font-size: 12px !important;
+    margin-top: 0 !important;
+    line-height: 1.2 !important;
+}
+
+/* Remove unnecessary margins */
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0 !important;
+}
+
+.row > [class*='col-'] > * {
+    margin-bottom: 0 !important;
+}
+
+/* Collapse vertical space between sections */
+.dashboard-card + .dashboard-card {
+    margin-top: -4px !important;
+}

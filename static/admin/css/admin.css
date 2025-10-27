@@ -1,0 +1,387 @@
+/* CartMax Enhanced Admin CSS */
+
+/* General Admin Enhancements */
+.admin-header {
+    background: linear-gradient(135deg, #007cba 0%, #004d7a 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+/* Enhanced Product Form Styling */
+.pricing-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.pricing-section h3 {
+    color: #007cba;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+}
+
+/* Price Input Styling */
+.price-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.currency-symbol {
+    font-size: 18px;
+    font-weight: bold;
+    color: #007cba;
+    margin-right: 5px;
+}
+
+.price-field {
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: #007cba !important;
+    border: 2px solid #007cba !important;
+    border-radius: 5px !important;
+    padding: 8px 12px !important;
+}
+
+.original-price-field {
+    color: #666 !important;
+    border: 1px solid #ccc !important;
+    text-decoration: line-through;
+}
+
+/* Quick Discount Calculator */
+.quick-discount-section {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.quick-discount-section label {
+    font-weight: bold;
+    color: #856404;
+}
+
+.quick-discount {
+    background: #fff !important;
+    border: 2px solid #ffc107 !important;
+    border-radius: 5px !important;
+    font-weight: bold !important;
+}
+
+/* Stock Management */
+.stock-section {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.stock-input {
+    font-weight: bold !important;
+    color: #155724 !important;
+    border: 2px solid #28a745 !important;
+    border-radius: 5px !important;
+}
+
+.stock-alert-low {
+    background: #f8d7da !important;
+    border-color: #dc3545 !important;
+    color: #721c24 !important;
+}
+
+.stock-alert-critical {
+    background: #721c24 !important;
+    color: white !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Character Counter */
+.char-counter {
+    font-size: 12px;
+    color: #666;
+    float: right;
+    margin-top: 5px;
+}
+
+.char-counter.warning {
+    color: #ffc107;
+}
+
+.char-counter.danger {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Enhanced Table Styling */
+.enhanced-admin-table {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.enhanced-admin-table th {
+    background: linear-gradient(135deg, #007cba 0%, #004d7a 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 15px 12px;
+}
+
+.enhanced-admin-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.enhanced-admin-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Pricing Display */
+.price-display {
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-weight: bold;
+}
+
+.price-current {
+    color: #007cba;
+    font-size: 16px;
+}
+
+.price-original {
+    color: #666;
+    text-decoration: line-through;
+    font-size: 14px;
+}
+
+.discount-badge {
+    background: #dc3545;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.savings-amount {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+/* Status Indicators */
+.status-indicator {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-in-stock { background: #d4edda; color: #155724; }
+.status-low-stock { background: #fff3cd; color: #856404; }
+.status-out-stock { background: #f8d7da; color: #721c24; }
+.status-available { background: #d1ecf1; color: #0c5460; }
+.status-featured { background: #e2e3e5; color: #383d41; }
+
+/* Action Button Styling */
+.admin-action-btn {
+    background: linear-gradient(135deg, #007cba 0%, #004d7a 100%);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 5px 5px 0;
+}
+
+.admin-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,124,186,0.3);
+    color: white;
+}
+
+.admin-action-btn.danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.admin-action-btn.success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.admin-action-btn.warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: #212529;
+}
+
+/* Bulk Action Forms */
+.bulk-action-form {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin: 20px 0;
+}
+
+.bulk-action-form h3 {
+    color: #007cba;
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007cba;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group .help-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 3px;
+}
+
+/* Smart Pricing Analysis */
+.pricing-analysis-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 4px solid #007cba;
+}
+
+.pricing-recommendation {
+    background: #e7f3ff;
+    border: 1px solid #b8daff;
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 10px;
+}
+
+.pricing-recommendation.high-priority {
+    border-color: #dc3545;
+    background: #f8d7da;
+}
+
+.pricing-recommendation.medium-priority {
+    border-color: #ffc107;
+    background: #fff3cd;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .price-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .enhanced-admin-table {
+        font-size: 14px;
+    }
+    
+    .enhanced-admin-table th,
+    .enhanced-admin-table td {
+        padding: 8px;
+    }
+}
+
+/* Loading States */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007cba;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Legacy .admin-message styles - Deprecated in favor of modern toast notifications */
+/* DO NOT USE for new notifications. Use showToast() from toast_notifications.js instead */
+.admin-message {
+    padding: 12px 16px;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-weight: 500;
+}
+
+.admin-message.success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.admin-message.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.admin-message.warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}

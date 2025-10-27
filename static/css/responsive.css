@@ -1,0 +1,903 @@
+/* ============================================
+   CARTMAX - RESPONSIVE DESIGN SYSTEM
+   Global responsive utilities and fixes
+   ============================================ */
+
+/* ====================================
+   1. RESET & NORMALIZATION
+   ==================================== */
+
+html {
+  box-sizing: border-box;
+  overflow-x: hidden;
+  max-width: 100%;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Inter', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ====================================
+   2. RESPONSIVE BREAKPOINTS & VARIABLES
+   ==================================== */
+
+:root {
+  /* Breakpoints */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+
+  /* Container max-widths */
+  --container-max-width-sm: 540px;
+  --container-max-width-md: 720px;
+  --container-max-width-lg: 960px;
+  --container-max-width-xl: 1140px;
+  --container-max-width-2xl: 1320px;
+
+  /* Spacing Scale (8px base) */
+  --space-0: 0;
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+
+  /* Typography Scale */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 1rem;    /* 16px */
+  --font-size-lg: 1.125rem;  /* 18px */
+  --font-size-xl: 1.25rem;   /* 20px */
+  --font-size-2xl: 1.5rem;   /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem;  /* 36px */
+  --font-size-5xl: 3rem;     /* 48px */
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius-md: 0.5rem;    /* 8px */
+  --radius-lg: 0.75rem;   /* 12px */
+  --radius-xl: 1rem;      /* 16px */
+  --radius-2xl: 1.5rem;   /* 24px */
+  --radius-full: 9999px;
+}
+
+/* ====================================
+   3. GLOBAL RESPONSIVE UTILITIES
+   ==================================== */
+
+/* Container with max-width constraint */
+.container,
+.container-fluid {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 576px) {
+  .container {
+    max-width: var(--container-max-width-sm);
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: var(--container-max-width-md);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: var(--container-max-width-lg);
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: var(--container-max-width-xl);
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: var(--container-max-width-2xl);
+  }
+}
+
+/* ====================================
+   4. RESPONSIVE TEXT UTILITIES
+   ==================================== */
+
+/* Responsive Font Sizes */
+.text-h1, h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .text-h1, h1 {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-h1, h1 {
+    font-size: var(--font-size-4xl);
+  }
+}
+
+.text-h2, h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .text-h2, h2 {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+@media (min-width: 1024px) {
+  .text-h2, h2 {
+    font-size: var(--font-size-3xl);
+  }
+}
+
+.text-h3, h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+
+@media (min-width: 768px) {
+  .text-h3, h3 {
+    font-size: var(--font-size-xl);
+  }
+}
+
+.text-h4, h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+}
+
+@media (min-width: 768px) {
+  .text-h4, h4 {
+    font-size: var(--font-size-lg);
+  }
+}
+
+h5, .text-h5 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+h6, .text-h6 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Body text responsive sizing */
+body {
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 768px) {
+  body {
+    font-size: var(--font-size-base);
+  }
+}
+
+/* ====================================
+   5. RESPONSIVE SPACING UTILITIES
+   ==================================== */
+
+/* Margin utilities */
+.m-0 { margin: var(--space-0); }
+.m-1 { margin: var(--space-1); }
+.m-2 { margin: var(--space-2); }
+.m-3 { margin: var(--space-3); }
+.m-4 { margin: var(--space-4); }
+.m-5 { margin: var(--space-5); }
+.m-6 { margin: var(--space-6); }
+.m-8 { margin: var(--space-8); }
+.m-10 { margin: var(--space-10); }
+.m-12 { margin: var(--space-12); }
+
+/* Padding utilities */
+.p-0 { padding: var(--space-0); }
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+.p-10 { padding: var(--space-10); }
+.p-12 { padding: var(--space-12); }
+
+/* Responsive padding for sections */
+@media (max-width: 576px) {
+  .section-padding {
+    padding: var(--space-8) var(--space-4);
+  }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  .section-padding {
+    padding: var(--space-10) var(--space-6);
+  }
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: var(--space-12) var(--space-8);
+  }
+}
+
+/* ====================================
+   6. RESPONSIVE IMAGES
+   ==================================== */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Aspect ratio containers */
+.aspect-ratio-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.aspect-ratio-container::before {
+  content: '';
+  display: block;
+  padding-bottom: 100%;
+}
+
+.aspect-ratio-container img,
+.aspect-ratio-container iframe,
+.aspect-ratio-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 16:9 Aspect Ratio */
+.aspect-16-9::before {
+  padding-bottom: 56.25%;
+}
+
+/* 4:3 Aspect Ratio */
+.aspect-4-3::before {
+  padding-bottom: 75%;
+}
+
+/* 1:1 Aspect Ratio (Square) */
+.aspect-1-1::before {
+  padding-bottom: 100%;
+}
+
+/* ====================================
+   7. RESPONSIVE GRID UTILITIES
+   ==================================== */
+
+.grid,
+.row {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+@media (min-width: 576px) {
+  .grid,
+  .row {
+    gap: var(--space-6);
+  }
+}
+
+@media (min-width: 768px) {
+  .grid,
+  .row {
+    gap: var(--space-8);
+  }
+}
+
+/* Grid column helpers */
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 575px) {
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ====================================
+   8. RESPONSIVE FLEXBOX UTILITIES
+   ==================================== */
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* ====================================
+   9. RESPONSIVE DISPLAY UTILITIES
+   ==================================== */
+
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+/* Mobile First Display Utilities */
+@media (max-width: 575px) {
+  .hide-mobile { display: none !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .hide-tablet { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .hide-desktop { display: none !important; }
+  .show-desktop { display: block !important; }
+}
+
+@media (max-width: 767px) {
+  .show-mobile { display: block !important; }
+}
+
+/* ====================================
+   10. RESPONSIVE ALIGNMENT UTILITIES
+   ==================================== */
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.align-items-start { align-items: flex-start; }
+.align-items-center { align-items: center; }
+.align-items-end { align-items: flex-end; }
+
+.justify-content-start { justify-content: flex-start; }
+.justify-content-center { justify-content: center; }
+.justify-content-end { justify-content: flex-end; }
+.justify-content-between { justify-content: space-between; }
+
+/* Responsive text alignment */
+@media (max-width: 767px) {
+  .text-center-mobile { text-align: center; }
+  .text-left-mobile { text-align: left; }
+  .text-right-mobile { text-align: right; }
+}
+
+@media (min-width: 768px) {
+  .text-center-desktop { text-align: center; }
+  .text-left-desktop { text-align: left; }
+}
+
+/* ====================================
+   11. RESPONSIVE FORM UTILITIES
+   ==================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+textarea,
+select {
+  width: 100%;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid #ddd;
+  border-radius: var(--radius-md);
+  font-size: inherit;
+  font-family: inherit;
+}
+
+/* ====================================
+   12. RESPONSIVE BUTTON UTILITIES
+   ==================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: inherit;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Responsive button sizing */
+@media (max-width: 575px) {
+  .btn-responsive {
+    width: 100%;
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+@media (min-width: 576px) {
+  .btn-responsive {
+    width: auto;
+  }
+}
+
+/* ====================================
+   13. FIX FOR OVERFLOW ISSUES
+   ==================================== */
+
+/* Prevent horizontal scrolling */
+body,
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Fix elements that exceed viewport */
+main,
+section,
+article,
+aside,
+div[class*="container"],
+div[class*="wrapper"] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Table responsiveness */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+.table-responsive table {
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+/* ====================================
+   14. RESPONSIVE NAVBAR/NAVIGATION
+   ==================================== */
+
+nav {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Mobile-first navigation */
+@media (max-width: 767px) {
+  .navbar-brand {
+    font-size: var(--font-size-lg);
+  }
+
+  nav > ul {
+    flex-direction: column;
+    padding: var(--space-4) 0;
+  }
+
+  nav > ul > li {
+    width: 100%;
+    border-bottom: 1px solid #eee;
+  }
+}
+
+/* ====================================
+   15. RESPONSIVE FOOTER
+   ==================================== */
+
+footer {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+footer .grid,
+footer .row {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 576px) {
+  footer .grid,
+  footer .row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 992px) {
+  footer .grid,
+  footer .row {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ====================================
+   16. UTILITY CLASSES FOR COMMON ISSUES
+   ==================================== */
+
+/* Ensure no element exceeds viewport width */
+.no-overflow {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Center block elements */
+.center-block {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Full width container (but still responsive) */
+.w-100 { width: 100%; }
+.w-50 { width: 50%; }
+.max-w-full { max-width: 100%; }
+
+/* Responsive spacing helpers */
+.mt-auto-mobile {
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .mt-auto-desktop {
+    margin-top: auto;
+  }
+}
+
+/* ====================================
+   17. PRINT STYLES
+   ==================================== */
+
+@media print {
+  body {
+    font-size: 12pt;
+  }
+
+  .no-print {
+    display: none;
+  }
+}
+
+/* ====================================
+   18. ACCESSIBILITY UTILITIES
+   ==================================== */
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* ====================================
+   19. RESPONSIVE VIDEO/IFRAME
+   ==================================== */
+
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+.video-container,
+.embed-responsive {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.video-container iframe,
+.video-container video,
+.embed-responsive iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ====================================
+   20. LANDSCAPE MODE FIX
+   ==================================== */
+
+@media (max-width: 640px) and (orientation: landscape) {
+  h1, .text-h1 {
+    font-size: var(--font-size-xl);
+  }
+
+  h2, .text-h2 {
+    font-size: var(--font-size-lg);
+  }
+
+  body {
+    font-size: var(--font-size-xs);
+  }
+
+  .section-padding {
+    padding: var(--space-6) var(--space-3);
+  }
+}
+
+/* ====================================
+   21. CHECKOUT PAGE RESPONSIVE UTILITIES
+   ==================================== */
+
+/* Responsive padding utilities */
+.p-3 { padding: var(--space-3); }
+.p-md-4 { padding: var(--space-4); }
+.pt-4 { padding-top: var(--space-4); }
+.pb-3 { padding-bottom: var(--space-3); }
+.px-3 { padding-left: var(--space-3); padding-right: var(--space-3); }
+.px-md-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+
+/* Mobile-first responsive padding */
+@media (max-width: 767px) {
+  .p-md-4 {
+    padding: var(--space-3) !important;
+  }
+  
+  .px-md-4 {
+    padding-left: var(--space-3) !important;
+    padding-right: var(--space-3) !important;
+  }
+  
+  .me-md-3 {
+    margin-right: var(--space-2) !important;
+  }
+  
+  .me-3 {
+    margin-right: var(--space-2);
+  }
+  
+  .fs-md-5 {
+    font-size: var(--font-size-base) !important;
+  }
+  
+  .fs-md-4 {
+    font-size: var(--font-size-lg) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .me-md-3 {
+    margin-right: var(--space-6);
+  }
+  
+  .fs-md-5 {
+    font-size: var(--font-size-xl);
+  }
+  
+  .fs-md-4 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .p-md-4 {
+    padding: var(--space-4);
+  }
+  
+  .px-md-4 {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}
+
+/* Utility classes for checkout */
+.min-w-0 {
+  min-width: 0;
+}
+
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.flex-md-grow-0 {
+  flex-grow: 0;
+}
+
+.flex-md-grow-1 {
+  flex-grow: 1;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .flex-md-row {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 768px) {
+  .flex-md-row {
+    flex-direction: row;
+  }
+  
+  .flex-md-grow-0 {
+    flex-grow: 0;
+  }
+  
+  .flex-md-grow-1 {
+    flex-grow: 1;
+  }
+}
+
+/* Responsive margin utilities for checkout */
+.mb-lg-0 {
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 992px) {
+  .mb-lg-0 {
+    margin-bottom: 0;
+  }
+}
+
+/* Column responsive utilities */
+.col-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .col-md-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+  }
+  
+  .col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+  }
+  
+  .col-lg-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+}

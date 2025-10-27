@@ -1,0 +1,783 @@
+/* ============================================
+   CARTMAX - MINIMAL FIX CSS
+   Only fixes overflow and responsive issues
+   Works alongside Bootstrap - no conflicts
+   ============================================ */
+
+/* Fix horizontal overflow - the main issue */
+html {
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure all images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fix container overflow */
+.container,
+.container-fluid {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix sections that might overflow */
+section,
+main,
+article {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Ensure no element forces 110% width */
+div[style*="width: 110%"],
+div[style*="width:110%"] {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Fix Bootstrap grid if it has issues */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Ensure responsive navbar doesn't overflow */
+nav {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix product cards to not overflow */
+.product-card,
+.product-card-modern,
+.card {
+  max-width: 100%;
+}
+
+/* Responsive text sizes - minimal adjustments */
+@media (max-width: 576px) {
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+  
+  body {
+    font-size: 0.95rem !important;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+  h1 {
+    font-size: 2rem !important;
+  }
+  
+  h2 {
+    font-size: 1.75rem !important;
+  }
+}
+
+/* Fix button alignment */
+.btn {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Ensure tables don't overflow */
+.table-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  max-width: 100%;
+}
+
+/* Video/iframe responsive */
+iframe {
+  max-width: 100%;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix form elements */
+input,
+textarea,
+select {
+  max-width: 100%;
+}
+
+/* Remove any fixed widths that cause problems */
+@media (max-width: 767px) {
+  [style*="width: 100%"],
+  [style*="width:100%"] {
+    max-width: 100%;
+  }
+  
+  .floating-card {
+    position: relative !important;
+    margin-bottom: 1rem;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+  }
+}
+
+/* Ensure content fits in viewport */
+body,
+html {
+  width: 100%;
+  max-width: 100vw;
+}
+
+/* Fix if any element has transform that creates overflow */
+.hero-modern,
+.hero-section {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Ensure responsive spacing on mobile */
+@media (max-width: 576px) {
+  .p-4 {
+    padding: 0.75rem !important;
+  }
+  
+  .m-4 {
+    margin: 0.75rem !important;
+  }
+  
+  .py-5 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+  
+  .px-4 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+/* Utility class for no overflow */
+.no-overflow {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Responsive image aspect ratio */
+.img-container {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.img-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ====== NAVBAR RESPONSIVE FIXES ====== */
+
+/* Fix navbar to not overflow */
+.navbar-modern {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 0.75rem 0;
+}
+
+/* Navbar container */
+.navbar-modern .container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Mobile navbar fixes */
+@media (max-width: 991px) {
+  .navbar-modern {
+    padding: 0.5rem 0;
+  }
+  
+  .navbar-brand-modern {
+    font-size: 1.25rem;
+  }
+  
+  .navbar-toggler {
+    padding: 0.25rem;
+  }
+  
+  /* When collapsed, ensure menu doesn't overflow */
+  .navbar-collapse {
+    max-width: 100%;
+  }
+  
+  .navbar-collapse.show {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  /* Stack search on mobile */
+  .search-modern {
+    max-width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* User actions should wrap properly */
+  .d-flex.align-items-center.gap-2 {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  /* Sign In button should be full width on very small mobile */
+  .btn-outline {
+    min-width: auto;
+  }
+}
+
+/* Very small screens - stack everything */
+@media (max-width: 576px) {
+  .navbar-modern {
+    padding: 0.5rem 0;
+  }
+  
+  .navbar-brand-modern {
+    font-size: 1.1rem;
+  }
+  
+  .navbar-collapse.show {
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+  }
+  
+  /* Stack navigation items vertically */
+  .navbar-nav-modern {
+    flex-direction: column;
+  }
+  
+  .nav-link {
+    padding: 0.5rem 0.5rem !important;
+    font-size: 0.9rem;
+  }
+  
+  /* Stack all user actions */
+  .d-flex.align-items-center.gap-3 {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+  
+  .search-modern {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Buttons should not be too cramped */
+  .btn-ghost {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Fix Sign In button on mobile */
+.btn-outline {
+  white-space: nowrap;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 576px) {
+  .btn-outline {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+/* Ensure navbar doesn't have horizontal scroll */
+.navbar {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ====== COMPREHENSIVE OVERFLOW & FIT FIXES ====== */
+
+/* Fix any element with inline styles that force 110% or wider */
+time[style*="110%"],
+div[style*="110%"],
+section[style*="110%"],
+article[style*="110%"] {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Fix flex containers that might overflow */
+.d-flex {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix all sections and main areas */
+section,
+main,
+article,
+aside {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix containers that might have transforms causing overflow */
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+/* Fix rows and col systems */
+.row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 100%;
+}
+
+.col,
+[class*="col-"] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix any absolutely positioned elements */
+position[style*="position: absolute"],
+div[style*="position: absolute"] {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix elements with transform that might cause overflow */
+[style*="transform"] {
+  max-width: 100%;
+}
+
+/* Hero sections shouldn't overflow */
+.hero,
+.hero-section,
+.hero-modern,
+.jumbotron {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Product grids shouldn't exceed viewport */
+.product-grid,
+.products-container,
+.gallery,
+.carousel,
+.carousel-inner {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix modals that might exceed viewport */
+.modal,
+.offcanvas,
+.dropdown-menu {
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+}
+
+/* Fix tables that overflow */
+table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto;
+}
+
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Fix any custom wrappers */
+.wrapper,
+.content-wrapper,
+.main-wrapper,
+.page-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix padding/margin overflow issues */
+[style*="padding: "],
+[style*="margin: "] {
+  max-width: 100%;
+}
+
+/* Additional safeguard: prevent any overflow */
+body > * {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Fix if any element uses width in viewport units incorrectly */
+[style*="100vw"],
+[style*="100%"] {
+  max-width: 100% !important;
+}
+
+/* Ensure no scrollbar appears */
+html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Fallback for all divs */
+div {
+  max-width: 100%;
+}
+
+/* ====== RESPONSIVE CONTENT FIT ====== */
+
+/* Mobile - extra padding removed, content fits screen */
+@media (max-width: 576px) {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  
+  section,
+  main,
+  article {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .container,
+  .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    margin: 0;
+  }
+  
+  /* Reduce excessive padding on mobile */
+  .p-5 {
+    padding: 0.5rem !important;
+  }
+  
+  .px-5 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  /* Ensure hero fits */
+  .hero-modern,
+  .hero,
+  .jumbotron {
+    padding: 1rem 0.5rem;
+    margin: 0;
+  }
+}
+
+/* Tablet - moderate padding */
+@media (min-width: 577px) and (max-width: 991px) {
+  .container,
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Desktop - normal padding */
+@media (min-width: 992px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ====== STANDARDIZED SPACING & ALIGNMENT ====== */
+
+/* Text alignment utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Responsive alignment - center on mobile */
+@media (max-width: 576px) {
+  .text-center-mobile { text-align: center; }
+}
+
+/* Button alignment */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+}
+
+.buttons-center {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Section titles */
+.section-title {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Fix random positioning */
+.position-fix {
+  position: relative;
+  left: auto !important;
+  right: auto !important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ====== RESPONSIVE IMAGES & MEDIA ====== */
+
+/* All images responsive by default */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Image utility classes */
+.img-responsive,
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Image containers */
+.img-container,
+.image-wrapper {
+  max-width: 100%;
+  overflow: hidden;
+  display: block;
+}
+
+.img-container img,
+.image-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Aspect ratio containers for consistent sizing */
+.aspect-ratio {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.aspect-ratio::before {
+  content: '';
+  display: block;
+  padding-bottom: 100%; /* 1:1 */
+}
+
+.aspect-ratio-16-9::before {
+  padding-bottom: 56.25%; /* 16:9 */
+}
+
+.aspect-ratio-4-3::before {
+  padding-bottom: 75%; /* 4:3 */
+}
+
+.aspect-ratio-3-2::before {
+  padding-bottom: 66.666%; /* 3:2 */
+}
+
+.aspect-ratio > img,
+.aspect-ratio > iframe,
+.aspect-ratio > video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Product images */
+.product-image,
+.product-img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Gallery images */
+.gallery img,
+.gallery-item img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Hero/banner images */
+.hero-image,
+.banner-image,
+.cover-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Video containers */
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.video-container,
+.embed-responsive {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.video-container iframe,
+.video-container video,
+.embed-responsive iframe,
+.embed-responsive video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Picture elements for responsive images */
+picture {
+  display: block;
+  max-width: 100%;
+}
+
+picture img {
+  width: 100%;
+  height: auto;
+}
+
+/* SVG responsiveness */
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Image broken state - hide broken images */
+img:broken,
+img.broken {
+  display: none;
+}
+
+/* Image placeholder */
+.img-placeholder {
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+  min-height: 200px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Lazy loading indicator */
+img[loading="lazy"] {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Responsive image sizing on mobile */
+@media (max-width: 576px) {
+  .img-container,
+  .image-wrapper {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .gallery img {
+    margin-bottom: 0.5rem;
+  }
+}

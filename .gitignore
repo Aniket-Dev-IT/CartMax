@@ -125,8 +125,8 @@ dmypy.json
 Thumbs.db
 
 # Django static files (in production)
-/static/
-/staticfiles/
+# /static/
+# /staticfiles/
 
 # Media files (optional - comment out if you want to track media)
 # /media/
